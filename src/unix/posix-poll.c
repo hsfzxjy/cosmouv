@@ -125,7 +125,7 @@ static void uv__pollfds_del(uv_loop_t* loop, int fd) {
        * Otherwise, when we are purging an invalidated fd, the value just
        * swapped here from the previous end of the array will be skipped.
        */
-       ++i;
+      ++i;
     }
   }
 }
@@ -196,7 +196,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
    */
   for (;;) {
     uv__io_poll_prepare(loop, pset, timeout);
-    nfds = poll(loop->poll_fds, (nfds_t)loop->poll_fds_used, timeout);
+    nfds = poll(loop->poll_fds, (nfds_t) loop->poll_fds_used, timeout);
     uv__io_poll_check(loop, pset);
 
     if (nfds == 0) {
@@ -297,7 +297,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
     uv__pollfds_del(loop, -1);
 
     if (have_signals != 0)
-      return;  /* Event loop should cycle now so don't poll again. */
+      return; /* Event loop should cycle now so don't poll again. */
 
     if (nevents != 0)
       return;
@@ -308,7 +308,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
     if (timeout == -1)
       continue;
 
-update_timeout:
+  update_timeout:
     assert(timeout > 0);
 
     time_diff = loop->time - time_base;

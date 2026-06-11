@@ -27,7 +27,8 @@
 
 #define CLIENT_TEST_PORT 9123
 #define SERVER_TEST_PORT 9124
-#define RECV_CB_MAX_CALL 3 /* ECONNREFUSED, EAGAIN/EWOULDBLOCK, ICMP delivery */
+#define RECV_CB_MAX_CALL                                                      \
+  3 /* ECONNREFUSED, EAGAIN/EWOULDBLOCK, ICMP delivery */
 
 static int recv_cb_called = 0;
 
@@ -35,9 +36,7 @@ static void udp_send_cb(uv_udp_send_t* req, int status) {
   ASSERT_EQ(status, 0);
 }
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   static char storage[4]; /* "PING" */
   buf->base = storage;
   buf->len = sizeof(storage);

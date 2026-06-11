@@ -35,9 +35,9 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#if defined(__APPLE__) || defined(__DragonFly__) || \
-    defined(__FreeBSD__) || defined(__NetBSD__)
-#include <sys/event.h>
+#if defined(__APPLE__) || defined(__DragonFly__) || defined(__FreeBSD__) ||   \
+    defined(__NetBSD__)
+# include <sys/event.h>
 #endif
 
 #define uv__msan_unpoison(p, n)                                               \
@@ -105,37 +105,33 @@ union uv__sockaddr {
   struct sockaddr addr;
 };
 
-#define ACCESS_ONCE(type, var)                                                \
-  (*(volatile type*) &(var))
+#define ACCESS_ONCE(type, var) (*(volatile type*) &(var))
 
-#define ROUND_UP(a, b)                                                        \
-  ((a) % (b) ? ((a) + (b)) - ((a) % (b)) : (a))
+#define ROUND_UP(a, b) ((a) % (b) ? ((a) + (b)) - ((a) % (b)) : (a))
 
 #define UNREACHABLE()                                                         \
   do {                                                                        \
     assert(0 && "unreachable code");                                          \
     abort();                                                                  \
-  }                                                                           \
-  while (0)
+  } while (0)
 
 #define SAVE_ERRNO(block)                                                     \
   do {                                                                        \
     int _saved_errno = errno;                                                 \
-    do { block; } while (0);                                                  \
+    do {                                                                      \
+      block;                                                                  \
+    } while (0);                                                              \
     errno = _saved_errno;                                                     \
-  }                                                                           \
-  while (0)
+  } while (0)
 
 /* The __clang__ and __INTEL_COMPILER checks are superfluous because they
  * define __GNUC__. They are here to convey to you, dear reader, that these
  * macros are enabled when compiling with clang or icc.
  */
-#if defined(__clang__) ||                                                     \
-    defined(__GNUC__) ||                                                      \
-    defined(__INTEL_COMPILER)
-# define UV_UNUSED(declaration)     __attribute__((unused)) declaration
+#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+# define UV_UNUSED(declaration) __attribute__((unused)) declaration
 #else
-# define UV_UNUSED(declaration)     declaration
+# define UV_UNUSED(declaration) declaration
 #endif
 
 /* Leans on the fact that, on Linux, POLLRDHUP == EPOLLRDHUP. */
@@ -180,8 +176,8 @@ enum {
 };
 
 typedef enum {
-  UV_CLOCK_PRECISE = 0,  /* Use the highest resolution clock available. */
-  UV_CLOCK_FAST = 1      /* Use the fastest clock with <= 1ms granularity. */
+  UV_CLOCK_PRECISE = 0, /* Use the highest resolution clock available. */
+  UV_CLOCK_FAST = 1     /* Use the fastest clock with <= 1ms granularity. */
 } uv_clocktype_t;
 
 struct uv__stream_queued_fds_s {
@@ -222,18 +218,14 @@ struct uv__statx {
 };
 #endif /* __linux__ */
 
-#if defined(_AIX) || \
-    defined(__APPLE__) || \
-    defined(__DragonFly__) || \
-    defined(__FreeBSD__) || \
-    defined(__linux__) || \
-    defined(__OpenBSD__) || \
+#if defined(_AIX) || defined(__APPLE__) || defined(__DragonFly__) ||          \
+    defined(__FreeBSD__) || defined(__linux__) || defined(__OpenBSD__) ||     \
     defined(__NetBSD__)
-#define uv__nonblock uv__nonblock_ioctl
-#define UV__NONBLOCK_IS_IOCTL 1
+# define uv__nonblock          uv__nonblock_ioctl
+# define UV__NONBLOCK_IS_IOCTL 1
 #else
-#define uv__nonblock uv__nonblock_fcntl
-#define UV__NONBLOCK_IS_IOCTL 0
+# define uv__nonblock          uv__nonblock_fcntl
+# define UV__NONBLOCK_IS_IOCTL 0
 #endif
 
 /* On Linux, uv__nonblock_fcntl() and uv__nonblock_ioctl() do not commute
@@ -244,8 +236,8 @@ struct uv__statx {
  * commutes with uv__nonblock().
  */
 #if defined(__linux__) && O_NDELAY != O_NONBLOCK
-#undef uv__nonblock
-#define uv__nonblock uv__nonblock_fcntl
+# undef uv__nonblock
+# define uv__nonblock uv__nonblock_fcntl
 #endif
 
 /* core */
@@ -257,25 +249,25 @@ int uv__close_nocheckstdio(int fd);
 int uv__close_nocancel(int fd);
 int uv__socket(int domain, int type, int protocol);
 int uv__sock_reuseport(int fd);
-ssize_t uv__recvmsg(int fd, struct msghdr *msg, int flags);
+ssize_t uv__recvmsg(int fd, struct msghdr* msg, int flags);
 void uv__make_close_pending(uv_handle_t* handle);
 int uv__getiovmax(void);
 
 typedef enum {
-    UV__NO_IO_CB,
-    UV__AHAFS_EVENT,
-    UV__ASYNC_IO,
-    UV__FS_EVENT,
-    UV__FS_EVENT_READ,
-    UV__INOTIFY_READ,
-    UV__POLL_IO,
-    UV__SIGNAL_EVENT,
-    UV__SERVER_IO,
-    UV__STREAM_IO,
-    UV__UDP_IO,
+  UV__NO_IO_CB,
+  UV__AHAFS_EVENT,
+  UV__ASYNC_IO,
+  UV__FS_EVENT,
+  UV__FS_EVENT_READ,
+  UV__INOTIFY_READ,
+  UV__POLL_IO,
+  UV__SIGNAL_EVENT,
+  UV__SERVER_IO,
+  UV__STREAM_IO,
+  UV__UDP_IO,
 } uv__io_cb_t;
 
-#define uv__io_cb_get(w)      ((uv__io_cb_t)((w)->bits & 15))
+#define uv__io_cb_get(w) ((uv__io_cb_t) ((w)->bits & 15))
 #define uv__io_cb_set(w, cb)                                                  \
   do {                                                                        \
     (w)->bits -= uv__io_cb_get(w);                                            \
@@ -294,23 +286,20 @@ void uv__stream_io(uv_loop_t* loop, uv__io_t* w, unsigned int events);
 void uv__udp_io(uv_loop_t* loop, uv__io_t* w, unsigned int events);
 
 #ifndef _AIX
-#define uv__ahafs_event(loop, w, events) UNREACHABLE()
+# define uv__ahafs_event(loop, w, events) UNREACHABLE()
 #endif
 
-#if !defined(__APPLE__) &&                                                    \
-    !defined(__DragonFly__) &&                                                \
-    !defined(__FreeBSD__) &&                                                  \
-    !defined(__NetBSD__) &&                                                   \
-    !defined(__OpenBSD__)
-#define uv__fs_event(loop, w, events) UNREACHABLE()
+#if !defined(__APPLE__) && !defined(__DragonFly__) &&                         \
+    !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__)
+# define uv__fs_event(loop, w, events) UNREACHABLE()
 #endif
 
 #ifndef __linux__
-#define uv__inotify_read(loop, w, events) UNREACHABLE()
+# define uv__inotify_read(loop, w, events) UNREACHABLE()
 #endif
 
 #ifndef __sun__
-#define uv__fs_event_read(loop, w, events) UNREACHABLE()
+# define uv__fs_event_read(loop, w, events) UNREACHABLE()
 #endif
 
 void uv__io_cb(uv_loop_t* loop, uv__io_t* w, unsigned int events);
@@ -343,8 +332,7 @@ void uv__run_check(uv_loop_t* loop);
 void uv__run_prepare(uv_loop_t* loop);
 
 /* stream */
-void uv__stream_init(uv_loop_t* loop, uv_stream_t* stream,
-    uv_handle_type type);
+void uv__stream_init(uv_loop_t* loop, uv_stream_t* stream, uv_handle_type type);
 int uv__stream_open(uv_stream_t*, int fd, int flags);
 void uv__stream_destroy(uv_stream_t* stream);
 #if defined(__APPLE__)
@@ -423,35 +411,30 @@ int uv__iou_fs_fsync_or_fdatasync(uv_loop_t* loop,
 int uv__iou_fs_link(uv_loop_t* loop, uv_fs_t* req);
 int uv__iou_fs_mkdir(uv_loop_t* loop, uv_fs_t* req);
 int uv__iou_fs_open(uv_loop_t* loop, uv_fs_t* req);
-int uv__iou_fs_read_or_write(uv_loop_t* loop,
-                             uv_fs_t* req,
-                             int is_read);
+int uv__iou_fs_read_or_write(uv_loop_t* loop, uv_fs_t* req, int is_read);
 int uv__iou_fs_rename(uv_loop_t* loop, uv_fs_t* req);
-int uv__iou_fs_statx(uv_loop_t* loop,
-                     uv_fs_t* req,
-                     int is_fstat,
-                     int is_lstat);
+int uv__iou_fs_statx(uv_loop_t* loop, uv_fs_t* req, int is_fstat, int is_lstat);
 int uv__iou_fs_symlink(uv_loop_t* loop, uv_fs_t* req);
 int uv__iou_fs_unlink(uv_loop_t* loop, uv_fs_t* req);
 #else
-#define uv__iou_fs_close(loop, req) 0
-#define uv__iou_fs_ftruncate(loop, req) 0
-#define uv__iou_fs_fsync_or_fdatasync(loop, req, fsync_flags) 0
-#define uv__iou_fs_link(loop, req) 0
-#define uv__iou_fs_mkdir(loop, req) 0
-#define uv__iou_fs_open(loop, req) 0
-#define uv__iou_fs_read_or_write(loop, req, is_read) 0
-#define uv__iou_fs_rename(loop, req) 0
-#define uv__iou_fs_statx(loop, req, is_fstat, is_lstat) 0
-#define uv__iou_fs_symlink(loop, req) 0
-#define uv__iou_fs_unlink(loop, req) 0
+# define uv__iou_fs_close(loop, req)                           0
+# define uv__iou_fs_ftruncate(loop, req)                       0
+# define uv__iou_fs_fsync_or_fdatasync(loop, req, fsync_flags) 0
+# define uv__iou_fs_link(loop, req)                            0
+# define uv__iou_fs_mkdir(loop, req)                           0
+# define uv__iou_fs_open(loop, req)                            0
+# define uv__iou_fs_read_or_write(loop, req, is_read)          0
+# define uv__iou_fs_rename(loop, req)                          0
+# define uv__iou_fs_statx(loop, req, is_fstat, is_lstat)       0
+# define uv__iou_fs_symlink(loop, req)                         0
+# define uv__iou_fs_unlink(loop, req)                          0
 #endif
 
 #if defined(__APPLE__)
 int uv___stream_fd(const uv_stream_t* handle);
-#define uv__stream_fd(handle) (uv___stream_fd((const uv_stream_t*) (handle)))
+# define uv__stream_fd(handle) (uv___stream_fd((const uv_stream_t*) (handle)))
 #else
-#define uv__stream_fd(handle) ((handle)->io_watcher.fd)
+# define uv__stream_fd(handle) ((handle)->io_watcher.fd)
 #endif /* defined(__APPLE__) */
 
 int uv__make_pipe(int fds[2], int flags);
@@ -512,13 +495,12 @@ UV_UNUSED(static int uv__stat(const char* path, struct stat* s)) {
 
 #if defined(__linux__)
 void uv__fs_post(uv_loop_t* loop, uv_fs_t* req);
-ssize_t
-uv__fs_copy_file_range(int fd_in,
-                       off_t* off_in,
-                       int fd_out,
-                       off_t* off_out,
-                       size_t len,
-                       unsigned int flags);
+ssize_t uv__fs_copy_file_range(int fd_in,
+                               off_t* off_in,
+                               int fd_out,
+                               off_t* off_out,
+                               size_t len,
+                               unsigned int flags);
 int uv__statx(int dirfd,
               const char* path,
               int flags,
@@ -537,25 +519,25 @@ int uv__getsockpeername(const uv_handle_t* handle,
                         int* namelen);
 
 #if defined(__sun)
-#if !defined(_POSIX_VERSION) || _POSIX_VERSION < 200809L
+# if !defined(_POSIX_VERSION) || _POSIX_VERSION < 200809L
 size_t strnlen(const char* s, size_t maxlen);
-#endif
+# endif
 #endif
 
 #if defined(__FreeBSD__)
-ssize_t
-uv__fs_copy_file_range(int fd_in,
-                       off_t* off_in,
-                       int fd_out,
-                       off_t* off_out,
-                       size_t len,
-                       unsigned int flags);
+ssize_t uv__fs_copy_file_range(int fd_in,
+                               off_t* off_in,
+                               int fd_out,
+                               off_t* off_out,
+                               size_t len,
+                               unsigned int flags);
 #endif
 
-#if defined(__linux__) || (defined(__FreeBSD__) && __FreeBSD_version >= 1301000)
-#define UV__CPU_AFFINITY_SUPPORTED 1
+#if defined(__linux__) ||                                                     \
+    (defined(__FreeBSD__) && __FreeBSD_version >= 1301000)
+# define UV__CPU_AFFINITY_SUPPORTED 1
 #else
-#define UV__CPU_AFFINITY_SUPPORTED 0
+# define UV__CPU_AFFINITY_SUPPORTED 0
 #endif
 
 #ifdef __linux__
@@ -563,15 +545,15 @@ int uv__get_constrained_cpu(long long* quota);
 #endif
 
 #if defined(__sun) && !defined(__illumos__)
-#ifdef SO_FLOW_NAME
+# ifdef SO_FLOW_NAME
 /* Since it's impossible to detect the Solaris 11.4 version via OS macros,
  * so we check the presence of the socket option SO_FLOW_NAME that was first
  * introduced to Solaris 11.4 and define a custom macro for determining 11.4.
  */
-#define UV__SOLARIS_11_4 (1)
-#else
-#define UV__SOLARIS_11_4 (0)
-#endif
+#  define UV__SOLARIS_11_4 (1)
+# else
+#  define UV__SOLARIS_11_4 (0)
+# endif
 #endif
 
 #if defined(EVFILT_USER) && defined(NOTE_TRIGGER)
@@ -582,14 +564,14 @@ int uv__get_constrained_cpu(long long* quota);
  * it may still fail to work at runtime somehow. In that case, we fall
  * back to pipe-based signaling.
  */
-#define UV__KQUEUE_EVFILT_USER 1
+# define UV__KQUEUE_EVFILT_USER 1
 /* Magic number of identifier used for EVFILT_USER during runtime detection.
  * There are no Google hits for this number when I create it. That way,
  * people will be directed here if this number gets printed due to some
  * kqueue error and they google for help. */
-#define UV__KQUEUE_EVFILT_USER_IDENT 0x1e7e7711
+# define UV__KQUEUE_EVFILT_USER_IDENT 0x1e7e7711
 #else
-#define UV__KQUEUE_EVFILT_USER 0
+# define UV__KQUEUE_EVFILT_USER 0
 #endif
 
 extern char* uv_saved_argv0;

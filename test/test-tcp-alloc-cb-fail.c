@@ -49,9 +49,7 @@ static void conn_alloc_cb(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
   /* Do nothing, read_cb should be called with UV_ENOBUFS. */
 }
 
-static void conn_read_cb(uv_stream_t* stream,
-                         ssize_t nread,
-                         const uv_buf_t* buf) {
+static void conn_read_cb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
   ASSERT_EQ(nread, UV_ENOBUFS);
   ASSERT_NULL(buf->base);
   ASSERT_OK(buf->len);
@@ -79,9 +77,7 @@ static void connection_cb(uv_stream_t* tcp, int status) {
 
   ASSERT_OK(uv_tcp_init(tcp->loop, &incoming));
   ASSERT_OK(uv_accept(tcp, (uv_stream_t*) &incoming));
-  ASSERT_OK(uv_read_start((uv_stream_t*) &incoming,
-                          conn_alloc_cb,
-                          conn_read_cb));
+  ASSERT_OK(uv_read_start((uv_stream_t*) &incoming, conn_alloc_cb, conn_read_cb));
 
   connection_cb_called++;
 }
@@ -107,10 +103,8 @@ TEST_IMPL(tcp_alloc_cb_fail) {
   ASSERT_OK(uv_ip4_addr("127.0.0.1", TEST_PORT, &addr));
 
   ASSERT_OK(uv_tcp_init(uv_default_loop(), &client));
-  ASSERT_OK(uv_tcp_connect(&connect_req,
-                           &client,
-                           (struct sockaddr*) &addr,
-                           connect_cb));
+  ASSERT_OK(
+      uv_tcp_connect(&connect_req, &client, (struct sockaddr*) &addr, connect_cb));
 
   ASSERT_OK(uv_run(uv_default_loop(), UV_RUN_DEFAULT));
 

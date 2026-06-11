@@ -25,14 +25,12 @@
 #include <string.h>
 
 /* See test-ipc.c */
-void spawn_helper(uv_pipe_t* channel,
-                  uv_process_t* process,
-                  const char* helper);
+void spawn_helper(uv_pipe_t* channel, uv_process_t* process, const char* helper);
 
-#define NUM_WRITES 256
+#define NUM_WRITES        256
 #define BUFFERS_PER_WRITE 3
-#define BUFFER_SIZE 0x2000 /* 8 kb. */
-#define BUFFER_CONTENT 42
+#define BUFFER_SIZE       0x2000 /* 8 kb. */
+#define BUFFER_CONTENT    42
 
 #define XFER_SIZE (NUM_WRITES * BUFFERS_PER_WRITE * BUFFER_SIZE)
 
@@ -47,8 +45,7 @@ static size_t bytes_written;
 static size_t bytes_read;
 
 static void write_cb(uv_write_t* req, int status) {
-  struct write_info* write_info =
-      container_of(req, struct write_info, write_req);
+  struct write_info* write_info = container_of(req, struct write_info, write_req);
   ASSERT_OK(status);
   bytes_written += BUFFERS_PER_WRITE * BUFFER_SIZE;
   free(write_info);
@@ -73,21 +70,18 @@ static void do_write(uv_stream_t* handle) {
     bufs[i] = uv_buf_init(write_info->buffers[i], BUFFER_SIZE);
   }
 
-  r = uv_write(
-      &write_info->write_req, handle, bufs, BUFFERS_PER_WRITE, write_cb);
+  r = uv_write(&write_info->write_req, handle, bufs, BUFFERS_PER_WRITE, write_cb);
   ASSERT_OK(r);
 }
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   buf->base = malloc(suggested_size);
   buf->len = (int) suggested_size;
 }
 
 #ifndef _WIN32
-#include <sys/types.h>
-#include <unistd.h>
+# include <sys/types.h>
+# include <unistd.h>
 #endif
 
 static void read_cb(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf) {

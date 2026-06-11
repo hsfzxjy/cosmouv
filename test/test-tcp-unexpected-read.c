@@ -47,9 +47,7 @@ static void timer_cb(uv_timer_t* handle) {
 }
 
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   ASSERT(0 && "alloc_cb should not have been called");
 }
 
@@ -79,8 +77,7 @@ static void connection_cb(uv_stream_t* handle, int status) {
   ASSERT_OK(status);
   ASSERT_OK(uv_accept(handle, (uv_stream_t*) &peer_handle));
   ASSERT_OK(uv_read_start((uv_stream_t*) &peer_handle, alloc_cb, read_cb));
-  ASSERT_OK(uv_write(&write_req, (uv_stream_t*) &peer_handle,
-                     &buf, 1, write_cb));
+  ASSERT_OK(uv_write(&write_req, (uv_stream_t*) &peer_handle, &buf, 1, write_cb));
 }
 
 

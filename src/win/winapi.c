@@ -139,8 +139,7 @@ void uv__winapi_init(void) {
   if (powrprof_module != NULL) {
     u.proc = GetProcAddress(powrprof_module,
                             "PowerRegisterSuspendResumeNotification");
-    pPowerRegisterSuspendResumeNotification =
-        u.pPowerRegisterSuspendResumeNotification;
+    pPowerRegisterSuspendResumeNotification = u.pPowerRegisterSuspendResumeNotification;
   }
 
   bcryptprimitives_module = LoadLibraryExA("bcryptprimitives.dll",
@@ -163,8 +162,8 @@ void uv__winapi_init(void) {
     pGetHostNameW = u.pGetHostNameW;
   }
 
-  api_win_core_file_module =
-      GetModuleHandleW(L"api-ms-win-core-file-l2-1-4.dll");
+  api_win_core_file_module = GetModuleHandleW(
+      L"api-ms-win-core-file-l2-1-4.dll");
   if (api_win_core_file_module != NULL) {
     u.proc = GetProcAddress(api_win_core_file_module,
                             "GetFileInformationByName");

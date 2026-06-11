@@ -25,10 +25,10 @@
 #define UV_PLATFORM_LOOP_FIELDS                                               \
   uv__io_t inotify_read_watcher;                                              \
   void* inotify_watchers;                                                     \
-  int inotify_fd;                                                             \
+  int inotify_fd;
 
 #define UV_PLATFORM_FS_EVENT_FIELDS                                           \
   struct uv__queue watchers;                                                  \
-  int wd;                                                                     \
+  int wd;
 
 #endif /* UV_LINUX_H */

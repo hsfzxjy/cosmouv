@@ -61,12 +61,8 @@ TEST_IMPL(poll_multiple_handles) {
 #else
   ASSERT_NE(sock, -1);
 #endif
-  ASSERT_OK(uv_poll_init_socket(uv_default_loop(),
-                                &first_poll_handle,
-                                sock));
-  ASSERT_OK(uv_poll_init_socket(uv_default_loop(),
-                                &second_poll_handle,
-                                sock));
+  ASSERT_OK(uv_poll_init_socket(uv_default_loop(), &first_poll_handle, sock));
+  ASSERT_OK(uv_poll_init_socket(uv_default_loop(), &second_poll_handle, sock));
 
   ASSERT_OK(uv_poll_start(&first_poll_handle, UV_READABLE, poll_cb));
 
@@ -77,8 +73,7 @@ TEST_IMPL(poll_multiple_handles) {
   /* We do not track handles in an O(1) lookupable way on Windows,
    * so not checking that here.
    */
-  ASSERT_EQ(uv_poll_start(&second_poll_handle, UV_READABLE, poll_cb),
-            UV_EEXIST);
+  ASSERT_EQ(uv_poll_start(&second_poll_handle, UV_READABLE, poll_cb), UV_EEXIST);
 #endif
 
   /* After stopping the other polling handle, we now should be able to poll */

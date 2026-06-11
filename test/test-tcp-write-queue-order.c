@@ -73,11 +73,7 @@ static void connect_cb(uv_connect_t* req, int status) {
   buf = uv_buf_init(base, sizeof(base));
 
   for (i = 0; i < REQ_COUNT; i++) {
-    r = uv_write(&write_requests[i],
-                 req->handle,
-                 &buf,
-                 1,
-                 write_cb);
+    r = uv_write(&write_requests[i], req->handle, &buf, 1, write_cb);
     ASSERT_OK(r);
   }
 }
@@ -117,10 +113,8 @@ TEST_IMPL(tcp_write_queue_order) {
   ASSERT_OK(uv_ip4_addr("127.0.0.1", TEST_PORT, &addr));
 
   ASSERT_OK(uv_tcp_init(uv_default_loop(), &client));
-  ASSERT_OK(uv_tcp_connect(&connect_req,
-                           &client,
-                           (struct sockaddr*) &addr,
-                           connect_cb));
+  ASSERT_OK(
+      uv_tcp_connect(&connect_req, &client, (struct sockaddr*) &addr, connect_cb));
   ASSERT_OK(uv_send_buffer_size((uv_handle_t*) &client, &buffer_size));
 
   ASSERT_OK(uv_run(uv_default_loop(), UV_RUN_DEFAULT));
@@ -129,9 +123,8 @@ TEST_IMPL(tcp_write_queue_order) {
   ASSERT_EQ(1, connection_cb_called);
   ASSERT_GT(write_callbacks, 0);
   ASSERT_GT(write_cancelled_callbacks, 0);
-  ASSERT_EQ(write_callbacks +
-            write_error_callbacks +
-            write_cancelled_callbacks, REQ_COUNT);
+  ASSERT_EQ(write_callbacks + write_error_callbacks + write_cancelled_callbacks,
+            REQ_COUNT);
   ASSERT_EQ(3, close_cb_called);
 
   MAKE_VALGRIND_HAPPY(uv_default_loop());

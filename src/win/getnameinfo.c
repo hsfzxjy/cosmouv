@@ -27,15 +27,13 @@
 #include "req-inl.h"
 
 #ifndef GetNameInfo
-int WSAAPI GetNameInfoW(
-  const SOCKADDR *pSockaddr,
-  socklen_t SockaddrLength,
-  PWCHAR pNodeBuffer,
-  DWORD NodeBufferSize,
-  PWCHAR pServiceBuffer,
-  DWORD ServiceBufferSize,
-  INT Flags
-);
+int WSAAPI GetNameInfoW(const SOCKADDR* pSockaddr,
+                        socklen_t SockaddrLength,
+                        PWCHAR pNodeBuffer,
+                        DWORD NodeBufferSize,
+                        PWCHAR pServiceBuffer,
+                        DWORD ServiceBufferSize,
+                        INT Flags);
 #endif
 
 static void uv__getnameinfo_work(struct uv__work* w) {
@@ -46,7 +44,7 @@ static void uv__getnameinfo_work(struct uv__work* w) {
   int ret;
 
   req = container_of(w, uv_getnameinfo_t, work_req);
-  if (GetNameInfoW((struct sockaddr*)&req->storage,
+  if (GetNameInfoW((struct sockaddr*) &req->storage,
                    sizeof(req->storage),
                    host,
                    ARRAY_SIZE(host),
@@ -112,13 +110,9 @@ int uv_getnameinfo(uv_loop_t* loop,
     return UV_EINVAL;
 
   if (addr->sa_family == AF_INET) {
-    memcpy(&req->storage,
-           addr,
-           sizeof(struct sockaddr_in));
+    memcpy(&req->storage, addr, sizeof(struct sockaddr_in));
   } else if (addr->sa_family == AF_INET6) {
-    memcpy(&req->storage,
-           addr,
-           sizeof(struct sockaddr_in6));
+    memcpy(&req->storage, addr, sizeof(struct sockaddr_in6));
   } else {
     return UV_EINVAL;
   }

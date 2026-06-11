@@ -58,23 +58,23 @@
  *     be called.
  */
 
-static const unsigned first_handle_number_idle     = 2;
-static const unsigned first_handle_number_prepare  = 2;
-static const unsigned first_handle_number_check    = 2;
+static const unsigned first_handle_number_idle = 2;
+static const unsigned first_handle_number_prepare = 2;
+static const unsigned first_handle_number_check = 2;
 #ifdef __linux__
 static const unsigned first_handle_number_fs_event = 0;
 #endif
 
 
 #define DEFINE_GLOBALS_AND_CBS(name, ...)                                     \
-  static uv_##name##_t (name)[3];                                             \
+  static uv_##name##_t(name)[3];                                              \
   static unsigned name##_cb_calls[3];                                         \
                                                                               \
   static void name##2_cb(__VA_ARGS__) {                                       \
     ASSERT_PTR_EQ(handle, &(name)[2]);                                        \
     if (first_handle_number_##name == 2) {                                    \
-      uv_close((uv_handle_t*)&(name)[2], NULL);                               \
-      uv_close((uv_handle_t*)&(name)[1], NULL);                               \
+      uv_close((uv_handle_t*) &(name)[2], NULL);                              \
+      uv_close((uv_handle_t*) &(name)[1], NULL);                              \
     }                                                                         \
     name##_cb_calls[2]++;                                                     \
   }                                                                           \
@@ -87,16 +87,16 @@ static const unsigned first_handle_number_fs_event = 0;
   static void name##0_cb(__VA_ARGS__) {                                       \
     ASSERT_PTR_EQ(handle, &(name)[0]);                                        \
     if (first_handle_number_##name == 0) {                                    \
-      uv_close((uv_handle_t*)&(name)[0], NULL);                               \
-      uv_close((uv_handle_t*)&(name)[1], NULL);                               \
+      uv_close((uv_handle_t*) &(name)[0], NULL);                              \
+      uv_close((uv_handle_t*) &(name)[1], NULL);                              \
     }                                                                         \
     name##_cb_calls[0]++;                                                     \
   }                                                                           \
                                                                               \
   static const uv_##name##_cb name##_cbs[] = {                                \
-    name##0_cb,                                                               \
-    name##1_cb,                                                               \
-    name##2_cb,                                                               \
+      name##0_cb,                                                             \
+      name##1_cb,                                                             \
+      name##2_cb,                                                             \
   };
 
 #define INIT_AND_START(name, loop)                                            \
@@ -143,7 +143,7 @@ static void init_and_start_fs_events(uv_loop_t* loop) {
     ASSERT_OK(r);
 
     r = uv_fs_event_start(&fs_event[i],
-                          (uv_fs_event_cb)fs_event_cbs[i],
+                          (uv_fs_event_cb) fs_event_cbs[i],
                           watched_dir,
                           0);
     ASSERT_OK(r);
@@ -173,9 +173,9 @@ TEST_IMPL(queue_foreach_delete) {
 
   loop = uv_default_loop();
 
-  INIT_AND_START(idle,    loop);
+  INIT_AND_START(idle, loop);
   INIT_AND_START(prepare, loop);
-  INIT_AND_START(check,   loop);
+  INIT_AND_START(check, loop);
 
 #ifdef __linux__
   init_and_start_fs_events(loop);

@@ -20,7 +20,7 @@
  */
 
 #ifndef _WIN32_WINNT
-# define _WIN32_WINNT   0x0A00
+# define _WIN32_WINNT 0x0A00
 #endif
 
 #if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
@@ -39,7 +39,7 @@ typedef intptr_t ssize_t;
 #include <mswsock.h>
 /* Disable the typedef in mstcpip.h of MinGW. */
 #define _TCP_INITIAL_RTO_PARAMETERS _TCP_INITIAL_RTO_PARAMETERS__AVOID
-#define TCP_INITIAL_RTO_PARAMETERS TCP_INITIAL_RTO_PARAMETERS__AVOID
+#define TCP_INITIAL_RTO_PARAMETERS  TCP_INITIAL_RTO_PARAMETERS__AVOID
 #define PTCP_INITIAL_RTO_PARAMETERS PTCP_INITIAL_RTO_PARAMETERS__AVOID
 #include <ws2tcpip.h>
 #undef _TCP_INITIAL_RTO_PARAMETERS
@@ -63,7 +63,8 @@ typedef intptr_t ssize_t;
 #endif
 
 /* Define missing in Windows Kit Include\{VERSION}\ucrt\sys\stat.h */
-#if defined(_CRT_INTERNAL_NONSTDC_NAMES) && _CRT_INTERNAL_NONSTDC_NAMES && !defined(S_IFIFO)
+#if defined(_CRT_INTERNAL_NONSTDC_NAMES) && _CRT_INTERNAL_NONSTDC_NAMES &&    \
+    !defined(S_IFIFO)
 # define S_IFIFO _S_IFIFO
 #endif
 
@@ -82,10 +83,10 @@ typedef intptr_t ssize_t;
  * The additional signals have values that are common on other Unix
  * variants (Linux and Darwin)
  */
-#define SIGHUP                1
-#define SIGQUIT               3
-#define SIGKILL               9
-#define SIGWINCH             28
+#define SIGHUP   1
+#define SIGQUIT  3
+#define SIGKILL  9
+#define SIGWINCH 28
 
 /* Redefine NSIG to take SIGWINCH into consideration */
 #if defined(NSIG) && NSIG <= SIGWINCH
@@ -98,7 +99,7 @@ typedef intptr_t ssize_t;
 /* The CRT defines SIGABRT_COMPAT as 6, which equals SIGABRT on many unix-like
  * platforms. However MinGW doesn't define it, so we do. */
 #ifndef SIGABRT_COMPAT
-# define SIGABRT_COMPAT       6
+# define SIGABRT_COMPAT 6
 #endif
 
 /*
@@ -107,100 +108,90 @@ typedef intptr_t ssize_t;
  */
 #ifndef WSAID_ACCEPTEX
 # define WSAID_ACCEPTEX                                                       \
-         {0xb5367df1, 0xcbac, 0x11cf,                                         \
-         {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+   {0xb5367df1, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 
 # define WSAID_CONNECTEX                                                      \
-         {0x25a207b9, 0xddf3, 0x4660,                                         \
-         {0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e}}
+   {0x25a207b9, 0xddf3, 0x4660, {0x8e, 0xe9, 0x76, 0xe5, 0x8c, 0x74, 0x06, 0x3e}}
 
 # define WSAID_GETACCEPTEXSOCKADDRS                                           \
-         {0xb5367df2, 0xcbac, 0x11cf,                                         \
-         {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+   {0xb5367df2, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 
 # define WSAID_DISCONNECTEX                                                   \
-         {0x7fda2e11, 0x8630, 0x436f,                                         \
-         {0xa0, 0x31, 0xf5, 0x36, 0xa6, 0xee, 0xc1, 0x57}}
+   {0x7fda2e11, 0x8630, 0x436f, {0xa0, 0x31, 0xf5, 0x36, 0xa6, 0xee, 0xc1, 0x57}}
 
 # define WSAID_TRANSMITFILE                                                   \
-         {0xb5367df0, 0xcbac, 0x11cf,                                         \
-         {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
+   {0xb5367df0, 0xcbac, 0x11cf, {0x95, 0xca, 0x00, 0x80, 0x5f, 0x48, 0xa1, 0x92}}
 
-  typedef BOOL (PASCAL *LPFN_ACCEPTEX)
-                      (SOCKET sListenSocket,
-                       SOCKET sAcceptSocket,
-                       PVOID lpOutputBuffer,
-                       DWORD dwReceiveDataLength,
-                       DWORD dwLocalAddressLength,
-                       DWORD dwRemoteAddressLength,
-                       LPDWORD lpdwBytesReceived,
-                       LPOVERLAPPED lpOverlapped);
+typedef BOOL(PASCAL* LPFN_ACCEPTEX)(SOCKET sListenSocket,
+                                    SOCKET sAcceptSocket,
+                                    PVOID lpOutputBuffer,
+                                    DWORD dwReceiveDataLength,
+                                    DWORD dwLocalAddressLength,
+                                    DWORD dwRemoteAddressLength,
+                                    LPDWORD lpdwBytesReceived,
+                                    LPOVERLAPPED lpOverlapped);
 
-  typedef BOOL (PASCAL *LPFN_CONNECTEX)
-                      (SOCKET s,
-                       const struct sockaddr* name,
-                       int namelen,
-                       PVOID lpSendBuffer,
-                       DWORD dwSendDataLength,
-                       LPDWORD lpdwBytesSent,
-                       LPOVERLAPPED lpOverlapped);
+typedef BOOL(PASCAL* LPFN_CONNECTEX)(SOCKET s,
+                                     const struct sockaddr* name,
+                                     int namelen,
+                                     PVOID lpSendBuffer,
+                                     DWORD dwSendDataLength,
+                                     LPDWORD lpdwBytesSent,
+                                     LPOVERLAPPED lpOverlapped);
 
-  typedef void (PASCAL *LPFN_GETACCEPTEXSOCKADDRS)
-                      (PVOID lpOutputBuffer,
-                       DWORD dwReceiveDataLength,
-                       DWORD dwLocalAddressLength,
-                       DWORD dwRemoteAddressLength,
-                       LPSOCKADDR* LocalSockaddr,
-                       LPINT LocalSockaddrLength,
-                       LPSOCKADDR* RemoteSockaddr,
-                       LPINT RemoteSockaddrLength);
+typedef void(PASCAL* LPFN_GETACCEPTEXSOCKADDRS)(PVOID lpOutputBuffer,
+                                                DWORD dwReceiveDataLength,
+                                                DWORD dwLocalAddressLength,
+                                                DWORD dwRemoteAddressLength,
+                                                LPSOCKADDR* LocalSockaddr,
+                                                LPINT LocalSockaddrLength,
+                                                LPSOCKADDR* RemoteSockaddr,
+                                                LPINT RemoteSockaddrLength);
 
-  typedef BOOL (PASCAL *LPFN_DISCONNECTEX)
-                      (SOCKET hSocket,
-                       LPOVERLAPPED lpOverlapped,
-                       DWORD dwFlags,
-                       DWORD reserved);
+typedef BOOL(PASCAL* LPFN_DISCONNECTEX)(SOCKET hSocket,
+                                        LPOVERLAPPED lpOverlapped,
+                                        DWORD dwFlags,
+                                        DWORD reserved);
 
-  typedef BOOL (PASCAL *LPFN_TRANSMITFILE)
-                      (SOCKET hSocket,
-                       HANDLE hFile,
-                       DWORD nNumberOfBytesToWrite,
-                       DWORD nNumberOfBytesPerSend,
-                       LPOVERLAPPED lpOverlapped,
-                       LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers,
-                       DWORD dwFlags);
+typedef BOOL(PASCAL* LPFN_TRANSMITFILE)(SOCKET hSocket,
+                                        HANDLE hFile,
+                                        DWORD nNumberOfBytesToWrite,
+                                        DWORD nNumberOfBytesPerSend,
+                                        LPOVERLAPPED lpOverlapped,
+                                        LPTRANSMIT_FILE_BUFFERS lpTransmitBuffers,
+                                        DWORD dwFlags);
 
-  typedef PVOID RTL_SRWLOCK;
-  typedef RTL_SRWLOCK SRWLOCK, *PSRWLOCK;
+typedef PVOID RTL_SRWLOCK;
+typedef RTL_SRWLOCK SRWLOCK, *PSRWLOCK;
 #endif
 
-typedef int (WSAAPI* LPFN_WSARECV)
-            (SOCKET socket,
-             LPWSABUF buffers,
-             DWORD buffer_count,
-             LPDWORD bytes,
-             LPDWORD flags,
-             LPWSAOVERLAPPED overlapped,
-             LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
+typedef int(WSAAPI* LPFN_WSARECV)(
+    SOCKET socket,
+    LPWSABUF buffers,
+    DWORD buffer_count,
+    LPDWORD bytes,
+    LPDWORD flags,
+    LPWSAOVERLAPPED overlapped,
+    LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
 
-typedef int (WSAAPI* LPFN_WSARECVFROM)
-            (SOCKET socket,
-             LPWSABUF buffers,
-             DWORD buffer_count,
-             LPDWORD bytes,
-             LPDWORD flags,
-             struct sockaddr* addr,
-             LPINT addr_len,
-             LPWSAOVERLAPPED overlapped,
-             LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
+typedef int(WSAAPI* LPFN_WSARECVFROM)(
+    SOCKET socket,
+    LPWSABUF buffers,
+    DWORD buffer_count,
+    LPDWORD bytes,
+    LPDWORD flags,
+    struct sockaddr* addr,
+    LPINT addr_len,
+    LPWSAOVERLAPPED overlapped,
+    LPWSAOVERLAPPED_COMPLETION_ROUTINE completion_routine);
 
 #ifndef _NTDEF_
-  typedef LONG NTSTATUS;
-  typedef NTSTATUS *PNTSTATUS;
+typedef LONG NTSTATUS;
+typedef NTSTATUS* PNTSTATUS;
 #endif
 
 #ifndef RTL_CONDITION_VARIABLE_INIT
-  typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
+typedef PVOID CONDITION_VARIABLE, *PCONDITION_VARIABLE;
 #endif
 
 typedef struct _AFD_POLL_HANDLE_INFO {
@@ -279,7 +270,12 @@ typedef struct {
   DWORD tls_index;
 } uv_key_t;
 
-#define UV_ONCE_INIT { 0, { NULL } }
+#define UV_ONCE_INIT                                                          \
+  {                                                                           \
+    0, {                                                                      \
+      NULL                                                                    \
+    }                                                                         \
+  }
 
 typedef struct uv_once_s {
   unsigned char unused;
@@ -295,19 +291,19 @@ typedef struct uv__dirent_s {
   char d_name[1];
 } uv__dirent_t;
 
-#define UV_DIR_PRIVATE_FIELDS \
-  HANDLE dir_handle;          \
-  WIN32_FIND_DATAW find_data; \
+#define UV_DIR_PRIVATE_FIELDS                                                 \
+  HANDLE dir_handle;                                                          \
+  WIN32_FIND_DATAW find_data;                                                 \
   BOOL need_find_call;
 
 #define HAVE_DIRENT_TYPES
-#define UV__DT_DIR     UV_DIRENT_DIR
-#define UV__DT_FILE    UV_DIRENT_FILE
-#define UV__DT_LINK    UV_DIRENT_LINK
-#define UV__DT_FIFO    UV_DIRENT_FIFO
-#define UV__DT_SOCKET  UV_DIRENT_SOCKET
-#define UV__DT_CHAR    UV_DIRENT_CHAR
-#define UV__DT_BLOCK   UV_DIRENT_BLOCK
+#define UV__DT_DIR    UV_DIRENT_DIR
+#define UV__DT_FILE   UV_DIRENT_FILE
+#define UV__DT_LINK   UV_DIRENT_LINK
+#define UV__DT_FIFO   UV_DIRENT_FIFO
+#define UV__DT_SOCKET UV_DIRENT_SOCKET
+#define UV__DT_CHAR   UV_DIRENT_CHAR
+#define UV__DT_BLOCK  UV_DIRENT_BLOCK
 
 /* Platform-specific definitions for uv_dlopen support. */
 #define UV_DYNAMIC FAR WINAPI
@@ -317,7 +313,7 @@ typedef struct {
 } uv_lib_t;
 
 #define UV_LOOP_PRIVATE_FIELDS                                                \
-    /* The loop's I/O completion port */                                      \
+  /* The loop's I/O completion port */                                        \
   HANDLE iocp;                                                                \
   /* The current time according to the event loop. in msecs. */               \
   uint64_t time;                                                              \
@@ -329,7 +325,7 @@ typedef struct {
   uv_handle_t* endgame_handles;                                               \
   /* TODO(bnoordhuis) Stop heap-allocating |timer_heap| in libuv v2.x. */     \
   void* timer_heap;                                                           \
-    /* Lists of active loop (prepare / check / idle) watchers */              \
+  /* Lists of active loop (prepare / check / idle) watchers */                \
   uv_prepare_t* prepare_handles;                                              \
   uv_check_t* check_handles;                                                  \
   uv_idle_t* idle_handles;                                                    \
@@ -355,46 +351,40 @@ typedef struct {
 
 #define UV_REQ_TYPE_PRIVATE                                                   \
   /* TODO: remove the req suffix */                                           \
-  UV_ACCEPT,                                                                  \
-  UV_FS_EVENT_REQ,                                                            \
-  UV_POLL_REQ,                                                                \
-  UV_PROCESS_EXIT,                                                            \
-  UV_READ,                                                                    \
-  UV_UDP_RECV,                                                                \
-  UV_WAKEUP,                                                                  \
-  UV_SIGNAL_REQ,
+  UV_ACCEPT, UV_FS_EVENT_REQ, UV_POLL_REQ, UV_PROCESS_EXIT, UV_READ,          \
+      UV_UDP_RECV, UV_WAKEUP, UV_SIGNAL_REQ,
 
-#define UV_REQ_PRIVATE_FIELDS                                                 \
-  union {                                                                     \
-    /* Used by I/O operations */                                              \
-    struct {                                                                  \
-      OVERLAPPED overlapped;                                                  \
-      size_t queued_bytes;                                                    \
-    } io;                                                                     \
-    /* in v2, we can move these to the UV_CONNECT_PRIVATE_FIELDS */           \
-    struct {                                                                  \
-      ULONG_PTR result; /* overlapped.Internal is reused to hold the result */\
-      HANDLE pipeHandle;                                                      \
-      DWORD duplex_flags;                                                     \
+#define UV_REQ_PRIVATE_FIELDS                                                  \
+  union {                                                                      \
+    /* Used by I/O operations */                                               \
+    struct {                                                                   \
+      OVERLAPPED overlapped;                                                   \
+      size_t queued_bytes;                                                     \
+    } io;                                                                      \
+    /* in v2, we can move these to the UV_CONNECT_PRIVATE_FIELDS */            \
+    struct {                                                                   \
+      ULONG_PTR result; /* overlapped.Internal is reused to hold the result */ \
+      HANDLE pipeHandle;                                                       \
+      DWORD duplex_flags;                                                      \
       WCHAR* name;                                                             \
-    } connect;                                                                \
-  } u;                                                                        \
+    } connect;                                                                 \
+  } u;                                                                         \
   struct uv_req_s* next_req;
 
-#define UV_WRITE_PRIVATE_FIELDS \
-  int coalesced;                \
-  uv_buf_t write_buffer;        \
-  HANDLE event_handle;          \
+#define UV_WRITE_PRIVATE_FIELDS                                               \
+  int coalesced;                                                              \
+  uv_buf_t write_buffer;                                                      \
+  HANDLE event_handle;                                                        \
   HANDLE wait_handle;
 
-#define UV_CONNECT_PRIVATE_FIELDS                                             \
-  /* empty */
+#define UV_CONNECT_PRIVATE_FIELDS
+/* empty */
 
-#define UV_SHUTDOWN_PRIVATE_FIELDS                                            \
-  /* empty */
+#define UV_SHUTDOWN_PRIVATE_FIELDS
+/* empty */
 
-#define UV_UDP_SEND_PRIVATE_FIELDS                                            \
-  /* empty */
+#define UV_UDP_SEND_PRIVATE_FIELDS
+/* empty */
 
 #define UV_PRIVATE_REQ_TYPES                                                  \
   typedef struct uv_pipe_accept_s {                                           \
@@ -422,16 +412,19 @@ typedef struct {
   unsigned int write_reqs_pending;                                            \
   uv_shutdown_t* shutdown_req;
 
-#define uv_stream_server_fields                                               \
-  uv_connection_cb connection_cb;
+#define uv_stream_server_fields uv_connection_cb connection_cb;
 
 #define UV_STREAM_PRIVATE_FIELDS                                              \
   unsigned int reqs_pending;                                                  \
   int activecnt;                                                              \
   uv_read_t read_req;                                                         \
   union {                                                                     \
-    struct { uv_stream_connection_fields } conn;                              \
-    struct { uv_stream_server_fields     } serv;                              \
+    struct {                                                                  \
+      uv_stream_connection_fields                                             \
+    } conn;                                                                   \
+    struct {                                                                  \
+      uv_stream_server_fields                                                 \
+    } serv;                                                                   \
   } stream;
 
 #define uv_tcp_server_fields                                                  \
@@ -448,8 +441,12 @@ typedef struct {
   SOCKET socket;                                                              \
   int delayed_error;                                                          \
   union {                                                                     \
-    struct { uv_tcp_server_fields } serv;                                     \
-    struct { uv_tcp_connection_fields } conn;                                 \
+    struct {                                                                  \
+      uv_tcp_server_fields                                                    \
+    } serv;                                                                   \
+    struct {                                                                  \
+      uv_tcp_connection_fields                                                \
+    } conn;                                                                   \
   } tcp;
 
 #define UV_UDP_PRIVATE_FIELDS                                                 \
@@ -488,8 +485,12 @@ typedef struct {
   HANDLE handle;                                                              \
   WCHAR* name;                                                                \
   union {                                                                     \
-    struct { uv_pipe_server_fields } serv;                                    \
-    struct { uv_pipe_connection_fields } conn;                                \
+    struct {                                                                  \
+      uv_pipe_server_fields                                                   \
+    } serv;                                                                   \
+    struct {                                                                  \
+      uv_pipe_connection_fields                                               \
+    } conn;                                                                   \
   } pipe;
 
 /* TODO: put the parser states in a union - TTY handles are always half-duplex
@@ -638,8 +639,7 @@ typedef struct {
     } time;                                                                   \
   } fs;
 
-#define UV_WORK_PRIVATE_FIELDS                                                \
-  struct uv__work work_req;
+#define UV_WORK_PRIVATE_FIELDS struct uv__work work_req;
 
 #define UV_FS_EVENT_PRIVATE_FIELDS                                            \
   struct uv_fs_event_req_s {                                                  \
@@ -659,40 +659,40 @@ typedef struct {
   unsigned long pending_signum;
 
 #ifndef F_OK
-#define F_OK 0
+# define F_OK 0
 #endif
 #ifndef R_OK
-#define R_OK 4
+# define R_OK 4
 #endif
 #ifndef W_OK
-#define W_OK 2
+# define W_OK 2
 #endif
 #ifndef X_OK
-#define X_OK 1
+# define X_OK 1
 #endif
 
 /* fs open() flags supported on this platform: */
-#define UV_FS_O_APPEND       _O_APPEND
-#define UV_FS_O_CREAT        _O_CREAT
-#define UV_FS_O_EXCL         _O_EXCL
-#define UV_FS_O_FILEMAP      0x20000000
-#define UV_FS_O_RANDOM       _O_RANDOM
-#define UV_FS_O_RDONLY       _O_RDONLY
-#define UV_FS_O_RDWR         _O_RDWR
-#define UV_FS_O_SEQUENTIAL   _O_SEQUENTIAL
-#define UV_FS_O_SHORT_LIVED  _O_SHORT_LIVED
-#define UV_FS_O_TEMPORARY    _O_TEMPORARY
-#define UV_FS_O_TRUNC        _O_TRUNC
-#define UV_FS_O_WRONLY       _O_WRONLY
+#define UV_FS_O_APPEND      _O_APPEND
+#define UV_FS_O_CREAT       _O_CREAT
+#define UV_FS_O_EXCL        _O_EXCL
+#define UV_FS_O_FILEMAP     0x20000000
+#define UV_FS_O_RANDOM      _O_RANDOM
+#define UV_FS_O_RDONLY      _O_RDONLY
+#define UV_FS_O_RDWR        _O_RDWR
+#define UV_FS_O_SEQUENTIAL  _O_SEQUENTIAL
+#define UV_FS_O_SHORT_LIVED _O_SHORT_LIVED
+#define UV_FS_O_TEMPORARY   _O_TEMPORARY
+#define UV_FS_O_TRUNC       _O_TRUNC
+#define UV_FS_O_WRONLY      _O_WRONLY
 
 /* fs open() flags supported on other platforms (or mapped on this platform): */
-#define UV_FS_O_DIRECT       0x02000000 /* FILE_FLAG_NO_BUFFERING */
-#define UV_FS_O_DIRECTORY    0
-#define UV_FS_O_DSYNC        0x04000000 /* FILE_FLAG_WRITE_THROUGH */
-#define UV_FS_O_EXLOCK       0x10000000 /* EXCLUSIVE SHARING MODE */
-#define UV_FS_O_NOATIME      0
-#define UV_FS_O_NOCTTY       0
-#define UV_FS_O_NOFOLLOW     0
-#define UV_FS_O_NONBLOCK     0
-#define UV_FS_O_SYMLINK      0
-#define UV_FS_O_SYNC         0x08000000 /* FILE_FLAG_WRITE_THROUGH */
+#define UV_FS_O_DIRECT    0x02000000 /* FILE_FLAG_NO_BUFFERING */
+#define UV_FS_O_DIRECTORY 0
+#define UV_FS_O_DSYNC     0x04000000 /* FILE_FLAG_WRITE_THROUGH */
+#define UV_FS_O_EXLOCK    0x10000000 /* EXCLUSIVE SHARING MODE */
+#define UV_FS_O_NOATIME   0
+#define UV_FS_O_NOCTTY    0
+#define UV_FS_O_NOFOLLOW  0
+#define UV_FS_O_NONBLOCK  0
+#define UV_FS_O_SYMLINK   0
+#define UV_FS_O_SYNC      0x08000000 /* FILE_FLAG_WRITE_THROUGH */

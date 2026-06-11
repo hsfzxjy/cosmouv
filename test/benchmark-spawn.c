@@ -64,18 +64,14 @@ static void process_close_cb(uv_handle_t* handle) {
 }
 
 
-static void exit_cb(uv_process_t* process,
-                    int64_t exit_status,
-                    int term_signal) {
+static void exit_cb(uv_process_t* process, int64_t exit_status, int term_signal) {
   ASSERT_EQ(42, exit_status);
   ASSERT_OK(term_signal);
-  uv_close((uv_handle_t*)process, process_close_cb);
+  uv_close((uv_handle_t*) process, process_close_cb);
 }
 
 
-static void on_alloc(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void on_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   buf->base = output + output_used;
   buf->len = OUTPUT_SIZE - output_used;
 }
@@ -94,7 +90,7 @@ static void on_read(uv_stream_t* pipe, ssize_t nread, const uv_buf_t* buf) {
     output_used += nread;
   } else if (nread < 0) {
     if (nread == UV_EOF) {
-      uv_close((uv_handle_t*)pipe, pipe_close_cb);
+      uv_close((uv_handle_t*) pipe, pipe_close_cb);
     }
   }
 }
@@ -120,7 +116,7 @@ static void spawn(void) {
   options.stdio_count = 2;
   options.stdio[0].flags = UV_IGNORE;
   options.stdio[1].flags = UV_CREATE_PIPE | UV_WRITABLE_PIPE;
-  options.stdio[1].data.stream = (uv_stream_t*)&out;
+  options.stdio[1].data.stream = (uv_stream_t*) &out;
 
   r = uv_spawn(loop, &process, &options);
   ASSERT_OK(r);
@@ -155,7 +151,8 @@ BENCHMARK_IMPL(spawn) {
   uv_update_time(loop);
   end_time = uv_now(loop);
 
-  fprintf(stderr, "spawn: %.0f spawns/s\n",
+  fprintf(stderr,
+          "spawn: %.0f spawns/s\n",
           (double) N / (double) (end_time - start_time) * 1000.0);
   fflush(stderr);
 

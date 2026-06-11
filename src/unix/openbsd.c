@@ -50,7 +50,8 @@ void uv_loadavg(double avg[3]) {
   size_t size = sizeof(info);
   int which[] = {CTL_VM, VM_LOADAVG};
 
-  if (sysctl(which, ARRAY_SIZE(which), &info, &size, NULL, 0) < 0) return;
+  if (sysctl(which, ARRAY_SIZE(which), &info, &size, NULL, 0) < 0)
+    return;
 
   avg[0] = (double) info.ldavg[0] / info.fscale;
   avg[1] = (double) info.ldavg[1] / info.fscale;
@@ -135,19 +136,19 @@ int uv_uptime(double* uptime) {
 
   now = time(NULL);
 
-  *uptime = (double)(now - info.tv_sec);
+  *uptime = (double) (now - info.tv_sec);
   return 0;
 }
 
 
 int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
-  unsigned int ticks = (unsigned int)sysconf(_SC_CLK_TCK),
-               multiplier = ((uint64_t)1000L / ticks), cpuspeed;
+  unsigned int ticks = (unsigned int) sysconf(_SC_CLK_TCK),
+               multiplier = ((uint64_t) 1000L / ticks), cpuspeed;
   uint64_t info[CPUSTATES];
   char model[512];
   int numcpus = 1;
-  int which[] = {CTL_HW,HW_MODEL};
-  int percpu[] = {CTL_KERN,KERN_CPTIME2,0};
+  int which[] = {CTL_HW, HW_MODEL};
+  int percpu[] = {CTL_KERN, KERN_CPTIME2, 0};
   size_t size;
   int i, j;
   uv_cpu_info_t* cpu_info;
@@ -189,11 +190,11 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
 
     cpu_info = &(*cpu_infos)[i];
 
-    cpu_info->cpu_times.user = (uint64_t)(info[CP_USER]) * multiplier;
-    cpu_info->cpu_times.nice = (uint64_t)(info[CP_NICE]) * multiplier;
-    cpu_info->cpu_times.sys = (uint64_t)(info[CP_SYS]) * multiplier;
-    cpu_info->cpu_times.idle = (uint64_t)(info[CP_IDLE]) * multiplier;
-    cpu_info->cpu_times.irq = (uint64_t)(info[CP_INTR]) * multiplier;
+    cpu_info->cpu_times.user = (uint64_t) (info[CP_USER]) * multiplier;
+    cpu_info->cpu_times.nice = (uint64_t) (info[CP_NICE]) * multiplier;
+    cpu_info->cpu_times.sys = (uint64_t) (info[CP_SYS]) * multiplier;
+    cpu_info->cpu_times.idle = (uint64_t) (info[CP_IDLE]) * multiplier;
+    cpu_info->cpu_times.irq = (uint64_t) (info[CP_INTR]) * multiplier;
 
     cpu_info->model = uv__strdup(model);
     cpu_info->speed = cpuspeed;

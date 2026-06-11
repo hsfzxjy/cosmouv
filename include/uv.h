@@ -28,27 +28,27 @@ extern "C" {
 #endif
 
 #if defined(BUILDING_UV_SHARED) && defined(USING_UV_SHARED)
-#error "Define either BUILDING_UV_SHARED or USING_UV_SHARED, not both."
+# error "Define either BUILDING_UV_SHARED or USING_UV_SHARED, not both."
 #endif
 
 #ifndef UV_EXTERN
-#ifdef _WIN32
-  /* Windows - set up dll import/export decorators. */
-# if defined(BUILDING_UV_SHARED)
-    /* Building shared library. */
+# ifdef _WIN32
+/* Windows - set up dll import/export decorators. */
+#  if defined(BUILDING_UV_SHARED)
+/* Building shared library. */
 #   define UV_EXTERN __declspec(dllexport)
-# elif defined(USING_UV_SHARED)
-    /* Using shared library. */
+#  elif defined(USING_UV_SHARED)
+/* Using shared library. */
 #   define UV_EXTERN __declspec(dllimport)
-# else
-    /* Building static library. */
+#  else
+/* Building static library. */
 #   define UV_EXTERN /* nothing */
+#  endif
+# elif defined(__GNUC__)
+#  define UV_EXTERN __attribute__((visibility("default")))
+# else
+#  define UV_EXTERN /* nothing */
 # endif
-#elif defined(__GNUC__)
-# define UV_EXTERN __attribute__((visibility("default")))
-#else
-# define UV_EXTERN /* nothing */
-#endif
 #endif /* UV_EXTERN */
 
 #include "uv/errno.h"
@@ -156,7 +156,7 @@ struct uv__queue {
   XX(ESOCKTNOSUPPORT, "socket type not supported")                            \
   XX(ENODATA, "no data available")                                            \
   XX(EUNATCH, "protocol driver not attached")                                 \
-  XX(ENOEXEC, "exec format error")                                            \
+  XX(ENOEXEC, "exec format error")
 
 #define UV_HANDLE_TYPE_MAP(XX)                                                \
   XX(ASYNC, async)                                                            \
@@ -174,7 +174,7 @@ struct uv__queue {
   XX(TIMER, timer)                                                            \
   XX(TTY, tty)                                                                \
   XX(UDP, udp)                                                                \
-  XX(SIGNAL, signal)                                                          \
+  XX(SIGNAL, signal)
 
 #define UV_REQ_TYPE_MAP(XX)                                                   \
   XX(REQ, req)                                                                \
@@ -186,13 +186,13 @@ struct uv__queue {
   XX(WORK, work)                                                              \
   XX(GETADDRINFO, getaddrinfo)                                                \
   XX(GETNAMEINFO, getnameinfo)                                                \
-  XX(RANDOM, random)                                                          \
+  XX(RANDOM, random)
 
 typedef enum {
-#define XX(code, _) UV_ ## code = UV__ ## code,
+#define XX(code, _) UV_##code = UV__##code,
   UV_ERRNO_MAP(XX)
 #undef XX
-  UV_ERRNO_MAX = UV__EOF - 1
+      UV_ERRNO_MAX = UV__EOF - 1
 } uv_errno_t;
 
 typedef enum {
@@ -209,8 +209,7 @@ typedef enum {
 #define XX(uc, lc) UV_##uc,
   UV_REQ_TYPE_MAP(XX)
 #undef XX
-  UV_REQ_TYPE_PRIVATE
-  UV_REQ_TYPE_MAX
+  UV_REQ_TYPE_PRIVATE UV_REQ_TYPE_MAX
 } uv_req_type;
 
 
@@ -436,7 +435,7 @@ UV_EXTERN char* uv_err_name_r(int err, char* buf, size_t buflen);
   uv_req_type type;                                                           \
   /* private */                                                               \
   void* reserved[6];                                                          \
-  UV_REQ_PRIVATE_FIELDS                                                       \
+  UV_REQ_PRIVATE_FIELDS
 
 /* Abstract base class of all requests. */
 struct uv_req_s {
@@ -473,7 +472,7 @@ struct uv_shutdown_s {
     int fd;                                                                   \
     void* reserved[4];                                                        \
   } u;                                                                        \
-  UV_HANDLE_PRIVATE_FIELDS                                                    \
+  UV_HANDLE_PRIVATE_FIELDS
 
 /* The abstract base class of all handles. */
 struct uv_handle_s {
@@ -599,9 +598,7 @@ UV_EXTERN int uv_tcp_init(uv_loop_t*, uv_tcp_t* handle);
 UV_EXTERN int uv_tcp_init_ex(uv_loop_t*, uv_tcp_t* handle, unsigned int flags);
 UV_EXTERN int uv_tcp_open(uv_tcp_t* handle, uv_os_sock_t sock);
 UV_EXTERN int uv_tcp_nodelay(uv_tcp_t* handle, int enable);
-UV_EXTERN int uv_tcp_keepalive(uv_tcp_t* handle,
-                               int enable,
-                               unsigned int delay);
+UV_EXTERN int uv_tcp_keepalive(uv_tcp_t* handle, int enable, unsigned int delay);
 UV_EXTERN int uv_tcp_keepalive_ex(uv_tcp_t* handle,
                                   int on,
                                   unsigned int idle,
@@ -849,7 +846,6 @@ extern "C++" {
 inline int uv_tty_set_mode(uv_tty_t* handle, int mode) {
   return uv_tty_set_mode(handle, static_cast<uv_tty_mode_t>(mode));
 }
-
 }
 #endif
 
@@ -957,9 +953,7 @@ struct uv_async_s {
   UV_ASYNC_PRIVATE_FIELDS
 };
 
-UV_EXTERN int uv_async_init(uv_loop_t*,
-                            uv_async_t* async,
-                            uv_async_cb async_cb);
+UV_EXTERN int uv_async_init(uv_loop_t*, uv_async_t* async, uv_async_cb async_cb);
 UV_EXTERN int uv_async_send(uv_async_t* async);
 
 
@@ -1030,9 +1024,9 @@ UV_EXTERN int uv_getnameinfo(uv_loop_t* loop,
 
 /* uv_spawn() options. */
 typedef enum {
-  UV_IGNORE         = 0x00,
-  UV_CREATE_PIPE    = 0x01,
-  UV_INHERIT_FD     = 0x02,
+  UV_IGNORE = 0x00,
+  UV_CREATE_PIPE = 0x01,
+  UV_INHERIT_FD = 0x02,
   UV_INHERIT_STREAM = 0x04,
 
   /*
@@ -1040,8 +1034,8 @@ typedef enum {
    * determine the direction of flow, from the child process' perspective. Both
    * flags may be specified to create a duplex data stream.
    */
-  UV_READABLE_PIPE  = 0x10,
-  UV_WRITABLE_PIPE  = 0x20,
+  UV_READABLE_PIPE = 0x10,
+  UV_WRITABLE_PIPE = 0x20,
 
   /*
    * When UV_CREATE_PIPE is specified, specifying UV_NONBLOCK_PIPE opens the
@@ -1049,7 +1043,7 @@ typedef enum {
    * if the child is not designed to handle to encounter this mode,
    * but can also be significantly more efficient.
    */
-  UV_NONBLOCK_PIPE  = 0x40,
+  UV_NONBLOCK_PIPE = 0x40,
   UV_OVERLAPPED_PIPE = 0x40 /* old name, for compatibility */
 } uv_stdio_flags;
 
@@ -1203,9 +1197,9 @@ UV_EXTERN int uv_cancel(uv_req_t* req);
 struct uv_cpu_times_s {
   uint64_t user; /* milliseconds */
   uint64_t nice; /* milliseconds */
-  uint64_t sys; /* milliseconds */
+  uint64_t sys;  /* milliseconds */
   uint64_t idle; /* milliseconds */
-  uint64_t irq; /* milliseconds */
+  uint64_t irq;  /* milliseconds */
 };
 
 struct uv_cpu_info_s {
@@ -1289,22 +1283,22 @@ UV_EXTERN uv_os_fd_t uv_get_osfhandle(int fd);
 UV_EXTERN int uv_open_osfhandle(uv_os_fd_t os_fd);
 
 typedef struct {
-   uv_timeval_t ru_utime; /* user CPU time used */
-   uv_timeval_t ru_stime; /* system CPU time used */
-   uint64_t ru_maxrss;    /* maximum resident set size */
-   uint64_t ru_ixrss;     /* integral shared memory size */
-   uint64_t ru_idrss;     /* integral unshared data size */
-   uint64_t ru_isrss;     /* integral unshared stack size */
-   uint64_t ru_minflt;    /* page reclaims (soft page faults) */
-   uint64_t ru_majflt;    /* page faults (hard page faults) */
-   uint64_t ru_nswap;     /* swaps */
-   uint64_t ru_inblock;   /* block input operations */
-   uint64_t ru_oublock;   /* block output operations */
-   uint64_t ru_msgsnd;    /* IPC messages sent */
-   uint64_t ru_msgrcv;    /* IPC messages received */
-   uint64_t ru_nsignals;  /* signals received */
-   uint64_t ru_nvcsw;     /* voluntary context switches */
-   uint64_t ru_nivcsw;    /* involuntary context switches */
+  uv_timeval_t ru_utime; /* user CPU time used */
+  uv_timeval_t ru_stime; /* system CPU time used */
+  uint64_t ru_maxrss;    /* maximum resident set size */
+  uint64_t ru_ixrss;     /* integral shared memory size */
+  uint64_t ru_idrss;     /* integral unshared data size */
+  uint64_t ru_isrss;     /* integral unshared stack size */
+  uint64_t ru_minflt;    /* page reclaims (soft page faults) */
+  uint64_t ru_majflt;    /* page faults (hard page faults) */
+  uint64_t ru_nswap;     /* swaps */
+  uint64_t ru_inblock;   /* block input operations */
+  uint64_t ru_oublock;   /* block output operations */
+  uint64_t ru_msgsnd;    /* IPC messages sent */
+  uint64_t ru_msgrcv;    /* IPC messages received */
+  uint64_t ru_nsignals;  /* signals received */
+  uint64_t ru_nvcsw;     /* voluntary context switches */
+  uint64_t ru_nivcsw;    /* involuntary context switches */
 } uv_rusage_t;
 
 UV_EXTERN int uv_getrusage(uv_rusage_t* rusage);
@@ -1322,19 +1316,19 @@ UV_EXTERN uv_pid_t uv_os_getppid(void);
 
 #if defined(__PASE__)
 /* On IBM i PASE, the highest process priority is -10 */
-# define UV_PRIORITY_LOW 39          /* RUNPTY(99) */
-# define UV_PRIORITY_BELOW_NORMAL 15 /* RUNPTY(50) */
-# define UV_PRIORITY_NORMAL 0        /* RUNPTY(20) */
-# define UV_PRIORITY_ABOVE_NORMAL -4 /* RUNTY(12) */
-# define UV_PRIORITY_HIGH -7         /* RUNPTY(6) */
-# define UV_PRIORITY_HIGHEST -10     /* RUNPTY(1) */
+# define UV_PRIORITY_LOW          39  /* RUNPTY(99) */
+# define UV_PRIORITY_BELOW_NORMAL 15  /* RUNPTY(50) */
+# define UV_PRIORITY_NORMAL       0   /* RUNPTY(20) */
+# define UV_PRIORITY_ABOVE_NORMAL -4  /* RUNTY(12) */
+# define UV_PRIORITY_HIGH         -7  /* RUNPTY(6) */
+# define UV_PRIORITY_HIGHEST      -10 /* RUNPTY(1) */
 #else
-# define UV_PRIORITY_LOW 19
+# define UV_PRIORITY_LOW          19
 # define UV_PRIORITY_BELOW_NORMAL 10
-# define UV_PRIORITY_NORMAL 0
+# define UV_PRIORITY_NORMAL       0
 # define UV_PRIORITY_ABOVE_NORMAL -7
-# define UV_PRIORITY_HIGH -14
-# define UV_PRIORITY_HIGHEST -20
+# define UV_PRIORITY_HIGH         -14
+# define UV_PRIORITY_HIGHEST      -20
 #endif
 
 UV_EXTERN int uv_os_getpriority(uv_pid_t pid, int* priority);
@@ -1375,7 +1369,7 @@ UV_EXTERN int uv_os_unsetenv(const char* name);
 #ifdef MAXHOSTNAMELEN
 # define UV_MAXHOSTNAMESIZE (MAXHOSTNAMELEN + 1)
 #else
-  /*
+/*
     Fallback for the maximum hostname size, including the null terminator. The
     Windows gethostname() documentation states that 256 bytes will always be
     large enough to hold the null-terminated hostname.
@@ -1455,7 +1449,7 @@ struct uv_fs_s {
   ssize_t result;
   void* ptr;
   const char* path;
-  uv_stat_t statbuf;  /* Stores the result of uv_fs_stat() and uv_fs_fstat(). */
+  uv_stat_t statbuf; /* Stores the result of uv_fs_stat() and uv_fs_fstat(). */
   UV_FS_PRIVATE_FIELDS
 };
 
@@ -1467,10 +1461,7 @@ UV_EXTERN const char* uv_fs_get_path(const uv_fs_t*);
 UV_EXTERN uv_stat_t* uv_fs_get_statbuf(uv_fs_t*);
 
 UV_EXTERN void uv_fs_req_cleanup(uv_fs_t* req);
-UV_EXTERN int uv_fs_close(uv_loop_t* loop,
-                          uv_fs_t* req,
-                          uv_file file,
-                          uv_fs_cb cb);
+UV_EXTERN int uv_fs_close(uv_loop_t* loop, uv_fs_t* req, uv_file file, uv_fs_cb cb);
 UV_EXTERN int uv_fs_open(uv_loop_t* loop,
                          uv_fs_t* req,
                          const char* path,
@@ -1499,7 +1490,7 @@ UV_EXTERN int uv_fs_write(uv_loop_t* loop,
  * This flag can be used with uv_fs_copyfile() to return an error if the
  * destination already exists.
  */
-#define UV_FS_COPYFILE_EXCL   0x0001
+#define UV_FS_COPYFILE_EXCL 0x0001
 
 /*
  * This flag can be used with uv_fs_copyfile() to attempt to create a reflink.
@@ -1541,8 +1532,7 @@ UV_EXTERN int uv_fs_scandir(uv_loop_t* loop,
                             const char* path,
                             int flags,
                             uv_fs_cb cb);
-UV_EXTERN int uv_fs_scandir_next(uv_fs_t* req,
-                                 uv_dirent_t* ent);
+UV_EXTERN int uv_fs_scandir_next(uv_fs_t* req, uv_dirent_t* ent);
 UV_EXTERN int uv_fs_opendir(uv_loop_t* loop,
                             uv_fs_t* req,
                             const char* path,
@@ -1559,19 +1549,13 @@ UV_EXTERN int uv_fs_stat(uv_loop_t* loop,
                          uv_fs_t* req,
                          const char* path,
                          uv_fs_cb cb);
-UV_EXTERN int uv_fs_fstat(uv_loop_t* loop,
-                          uv_fs_t* req,
-                          uv_file file,
-                          uv_fs_cb cb);
+UV_EXTERN int uv_fs_fstat(uv_loop_t* loop, uv_fs_t* req, uv_file file, uv_fs_cb cb);
 UV_EXTERN int uv_fs_rename(uv_loop_t* loop,
                            uv_fs_t* req,
                            const char* path,
                            const char* new_path,
                            uv_fs_cb cb);
-UV_EXTERN int uv_fs_fsync(uv_loop_t* loop,
-                          uv_fs_t* req,
-                          uv_file file,
-                          uv_fs_cb cb);
+UV_EXTERN int uv_fs_fsync(uv_loop_t* loop, uv_fs_t* req, uv_file file, uv_fs_cb cb);
 UV_EXTERN int uv_fs_fdatasync(uv_loop_t* loop,
                               uv_fs_t* req,
                               uv_file file,
@@ -1632,13 +1616,13 @@ UV_EXTERN int uv_fs_link(uv_loop_t* loop,
  * This flag can be used with uv_fs_symlink() on Windows to specify whether
  * path argument points to a directory.
  */
-#define UV_FS_SYMLINK_DIR          0x0001
+#define UV_FS_SYMLINK_DIR 0x0001
 
 /*
  * This flag can be used with uv_fs_symlink() on Windows to specify whether
  * the symlink is to be created using junction points.
  */
-#define UV_FS_SYMLINK_JUNCTION     0x0002
+#define UV_FS_SYMLINK_JUNCTION 0x0002
 
 UV_EXTERN int uv_fs_symlink(uv_loop_t* loop,
                             uv_fs_t* req,
@@ -1712,9 +1696,7 @@ UV_EXTERN int uv_fs_poll_start(uv_fs_poll_t* handle,
                                const char* path,
                                unsigned int interval);
 UV_EXTERN int uv_fs_poll_stop(uv_fs_poll_t* handle);
-UV_EXTERN int uv_fs_poll_getpath(uv_fs_poll_t* handle,
-                                 char* buffer,
-                                 size_t* size);
+UV_EXTERN int uv_fs_poll_getpath(uv_fs_poll_t* handle, char* buffer, size_t* size);
 
 
 struct uv_signal_s {
@@ -1802,9 +1784,9 @@ struct uv_random_s {
 
 UV_EXTERN int uv_random(uv_loop_t* loop,
                         uv_random_t* req,
-                        void *buf,
+                        void* buf,
                         size_t buflen,
-                        unsigned flags,  /* For future extension; must be 0. */
+                        unsigned flags, /* For future extension; must be 0. */
                         uv_random_cb cb);
 
 #if defined(IF_NAMESIZE)
@@ -1815,12 +1797,8 @@ UV_EXTERN int uv_random(uv_loop_t* loop,
 # define UV_IF_NAMESIZE (16 + 1)
 #endif
 
-UV_EXTERN int uv_if_indextoname(unsigned int ifindex,
-                                char* buffer,
-                                size_t* size);
-UV_EXTERN int uv_if_indextoiid(unsigned int ifindex,
-                               char* buffer,
-                               size_t* size);
+UV_EXTERN int uv_if_indextoname(unsigned int ifindex, char* buffer, size_t* size);
+UV_EXTERN int uv_if_indextoiid(unsigned int ifindex, char* buffer, size_t* size);
 
 UV_EXTERN int uv_exepath(char* buffer, size_t* size);
 
@@ -1920,14 +1898,14 @@ UV_EXTERN int uv_thread_getaffinity(uv_thread_t* tid,
                                     size_t mask_size);
 UV_EXTERN int uv_thread_getcpu(void);
 UV_EXTERN uv_thread_t uv_thread_self(void);
-UV_EXTERN int uv_thread_join(uv_thread_t *tid);
+UV_EXTERN int uv_thread_join(uv_thread_t* tid);
 UV_EXTERN int uv_thread_equal(const uv_thread_t* t1, const uv_thread_t* t2);
 UV_EXTERN int uv_thread_setname(const char* name);
 UV_EXTERN int uv_thread_getname(uv_thread_t* tid, char* name, size_t size);
 
 
 /* The presence of these unions force similar struct layout. */
-#define XX(_, name) uv_ ## name ## _t name;
+#define XX(_, name) uv_##name##_t name;
 union uv_any_handle {
   UV_HANDLE_TYPE_MAP(XX)
 };

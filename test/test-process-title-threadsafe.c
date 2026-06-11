@@ -31,12 +31,14 @@
 # define NUM_ITERATIONS 50
 #endif
 
-static const char* titles[] = {
-  "8L2NY0Kdj0XyNFZnmUZigIOfcWjyNr0SkMmUhKw99VLUsZFrvCQQC3XIRfNR8pjyMjXObllled",
-  "jUAcscJN49oLSN8GdmXj2Wo34XX2T2vp2j5khfajNQarlOulp57cE130yiY53ipJFnPyTn5i82",
-  "9niCI5icXGFS72XudhXqo5alftmZ1tpE7B3cwUmrq0CCDjC84FzBNB8XAHqvpNQfI2QAQG6ztT",
-  "n8qXVXuG6IEHDpabJgTEiwtpY6LHMZ8MgznnMpdHARu5EywufA6hcBaQfetb0YhEsK0ykDd7JU"
-};
+static const char* titles[] = {"8L2NY0Kdj0XyNFZnmUZigIOfcWjyNr0SkMmUhKw99VLUsZ"
+                               "FrvCQQC3XIRfNR8pjyMjXObllled",
+                               "jUAcscJN49oLSN8GdmXj2Wo34XX2T2vp2j5khfajNQarlO"
+                               "ulp57cE130yiY53ipJFnPyTn5i82",
+                               "9niCI5icXGFS72XudhXqo5alftmZ1tpE7B3cwUmrq0CCDj"
+                               "C84FzBNB8XAHqvpNQfI2QAQG6ztT",
+                               "n8qXVXuG6IEHDpabJgTEiwtpY6LHMZ8MgznnMpdHARu5Ey"
+                               "wufA6hcBaQfetb0YhEsK0ykDd7JU"};
 
 static void getter_thread_body(void* arg) {
   uv_sem_t* getter_sem;
@@ -55,11 +57,10 @@ static void getter_thread_body(void* arg) {
     len = strlen(buffer);
     ASSERT_GT(len, 0);
 
-    ASSERT(
-      0 == strncmp(buffer, titles[0], len) ||
-      0 == strncmp(buffer, titles[1], len) ||
-      0 == strncmp(buffer, titles[2], len) ||
-      0 == strncmp(buffer, titles[3], len));
+    ASSERT(0 == strncmp(buffer, titles[0], len) ||
+           0 == strncmp(buffer, titles[1], len) ||
+           0 == strncmp(buffer, titles[2], len) ||
+           0 == strncmp(buffer, titles[3], len));
 
     uv_sleep(0);
   }
@@ -84,7 +85,7 @@ TEST_IMPL(process_title_threadsafe) {
   uv_sem_t getter_sem;
   int i;
 
-#if defined(__sun) || defined(__CYGWIN__) || defined(__MSYS__) || \
+#if defined(__sun) || defined(__CYGWIN__) || defined(__MSYS__) ||             \
     defined(__MVS__) || defined(__PASE__) || defined(__QNX__)
   RETURN_SKIP("uv_(get|set)_process_title is not implemented.");
 #endif

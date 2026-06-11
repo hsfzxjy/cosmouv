@@ -26,8 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHECK_HANDLE(handle) \
-  ASSERT_NE((uv_udp_t*)(handle) == &server || (uv_udp_t*)(handle) == &client, 0)
+#define CHECK_HANDLE(handle)                                                    \
+  ASSERT_NE((uv_udp_t*) (handle) == &server || (uv_udp_t*) (handle) == &client, \
+            0)
 
 static uv_udp_t server;
 static uv_udp_t client;
@@ -71,7 +72,7 @@ TEST_IMPL(udp_multicast_interface) {
   ASSERT_OK(r);
 
   ASSERT_OK(uv_ip4_addr("0.0.0.0", 0, &baddr));
-  r = uv_udp_bind(&server, (const struct sockaddr*)&baddr, 0);
+  r = uv_udp_bind(&server, (const struct sockaddr*) &baddr, 0);
   ASSERT_OK(r);
 
   r = uv_udp_set_multicast_interface(&server, "0.0.0.0");
@@ -79,12 +80,7 @@ TEST_IMPL(udp_multicast_interface) {
 
   /* server sends "PING" */
   buf = uv_buf_init("PING", 4);
-  r = uv_udp_send(&req,
-                  &server,
-                  &buf,
-                  1,
-                  (const struct sockaddr*)&addr,
-                  sv_send_cb);
+  r = uv_udp_send(&req, &server, &buf, 1, (const struct sockaddr*) &addr, sv_send_cb);
   ASSERT_OK(r);
 
   ASSERT_OK(close_cb_called);

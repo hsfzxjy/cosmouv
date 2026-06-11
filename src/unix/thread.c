@@ -24,24 +24,24 @@
 
 #include <pthread.h>
 #ifdef __OpenBSD__
-#include <pthread_np.h>
+# include <pthread_np.h>
 #endif
 #include <assert.h>
 #include <errno.h>
 
 #include <sys/time.h>
-#include <sys/resource.h>  /* getrlimit() */
-#include <unistd.h>  /* getpagesize() */
+#include <sys/resource.h> /* getrlimit() */
+#include <unistd.h>       /* getpagesize() */
 
 #include <limits.h>
 
 #ifdef __MVS__
-#include <sys/ipc.h>
-#include <sys/sem.h>
+# include <sys/ipc.h>
+# include <sys/sem.h>
 #endif
 
 #if defined(__GLIBC__) && !defined(__UCLIBC__)
-#include <gnu/libc-version.h>  /* gnu_get_libc_version() */
+# include <gnu/libc-version.h> /* gnu_get_libc_version() */
 #endif
 
 #if defined(__linux__)
@@ -72,10 +72,10 @@
 static size_t uv__min_stack_size(void) {
   static const size_t min = 8192;
 
-#ifdef PTHREAD_STACK_MIN  /* Not defined on NetBSD. */
+#ifdef PTHREAD_STACK_MIN /* Not defined on NetBSD. */
   if (min < (size_t) PTHREAD_STACK_MIN)
     return PTHREAD_STACK_MIN;
-#endif  /* PTHREAD_STACK_MIN */
+#endif /* PTHREAD_STACK_MIN */
 
   return min;
 }
@@ -88,9 +88,9 @@ static size_t uv__default_stack_size(void) {
 #if !defined(__linux__)
   return 0;
 #elif defined(__PPC__) || defined(__ppc__) || defined(__powerpc__)
-  return 4 << 20;  /* glibc default. */
+  return 4 << 20; /* glibc default. */
 #else
-  return 2 << 20;  /* glibc default. */
+  return 2 << 20; /* glibc default. */
 #endif
 }
 
@@ -123,22 +123,22 @@ size_t uv__thread_stack_size(void) {
 }
 
 
-int uv_thread_create(uv_thread_t *tid, void (*entry)(void *arg), void *arg) {
+int uv_thread_create(uv_thread_t* tid, void (*entry)(void* arg), void* arg) {
   uv_thread_options_t params;
   params.flags = UV_THREAD_NO_FLAGS;
   return uv_thread_create_ex(tid, &params, entry, arg);
 }
 
 
-int uv_thread_detach(uv_thread_t *tid) {
+int uv_thread_detach(uv_thread_t* tid) {
   return UV__ERR(pthread_detach(*tid));
 }
 
 
 int uv_thread_create_ex(uv_thread_t* tid,
                         const uv_thread_options_t* params,
-                        void (*entry)(void *arg),
-                        void *arg) {
+                        void (*entry)(void* arg),
+                        void* arg) {
   int err;
   pthread_attr_t* attr;
   pthread_attr_t attr_storage;
@@ -152,16 +152,15 @@ int uv_thread_create_ex(uv_thread_t* tid,
     void* (*out)(void*);
   } f;
 
-  stack_size =
-      params->flags & UV_THREAD_HAS_STACK_SIZE ? params->stack_size : 0;
+  stack_size = params->flags & UV_THREAD_HAS_STACK_SIZE ? params->stack_size : 0;
 
   attr = NULL;
   if (stack_size == 0) {
     stack_size = uv__thread_stack_size();
   } else {
-    pagesize = (size_t)getpagesize();
+    pagesize = (size_t) getpagesize();
     /* Round up to the nearest page boundary. */
-    stack_size = (stack_size + pagesize - 1) &~ (pagesize - 1);
+    stack_size = (stack_size + pagesize - 1) & ~(pagesize - 1);
     min_stack_size = uv__min_stack_size();
     if (stack_size < min_stack_size)
       stack_size = min_stack_size;
@@ -200,7 +199,7 @@ int uv_thread_setaffinity(uv_thread_t* tid,
   cpumasksize = uv_cpumask_size();
   if (cpumasksize < 0)
     return cpumasksize;
-  if (mask_size < (size_t)cpumasksize)
+  if (mask_size < (size_t) cpumasksize)
     return UV_EINVAL;
 
   if (oldmask != NULL) {
@@ -214,22 +213,20 @@ int uv_thread_setaffinity(uv_thread_t* tid,
     if (cpumask[i])
       CPU_SET(i, &cpuset);
 
-#if defined(__ANDROID__) || defined(__OHOS__)
+# if defined(__ANDROID__) || defined(__OHOS__)
   if (sched_setaffinity(pthread_gettid_np(*tid), sizeof(cpuset), &cpuset))
     r = errno;
   else
     r = 0;
-#else
+# else
   r = pthread_setaffinity_np(*tid, sizeof(cpuset), &cpuset);
-#endif
+# endif
 
   return UV__ERR(r);
 }
 
 
-int uv_thread_getaffinity(uv_thread_t* tid,
-                          char* cpumask,
-                          size_t mask_size) {
+int uv_thread_getaffinity(uv_thread_t* tid, char* cpumask, size_t mask_size) {
   int r;
   int i;
   uv__cpu_set_t cpuset;
@@ -238,18 +235,18 @@ int uv_thread_getaffinity(uv_thread_t* tid,
   cpumasksize = uv_cpumask_size();
   if (cpumasksize < 0)
     return cpumasksize;
-  if (mask_size < (size_t)cpumasksize)
+  if (mask_size < (size_t) cpumasksize)
     return UV_EINVAL;
 
   CPU_ZERO(&cpuset);
-#if defined(__ANDROID__) || defined(__OHOS__)
+# if defined(__ANDROID__) || defined(__OHOS__)
   if (sched_getaffinity(pthread_gettid_np(*tid), sizeof(cpuset), &cpuset))
     r = errno;
   else
     r = 0;
-#else
+# else
   r = pthread_getaffinity_np(*tid, sizeof(cpuset), &cpuset);
-#endif
+# endif
   if (r)
     return UV__ERR(r);
   for (i = 0; i < cpumasksize; i++)
@@ -266,9 +263,7 @@ int uv_thread_setaffinity(uv_thread_t* tid,
 }
 
 
-int uv_thread_getaffinity(uv_thread_t* tid,
-                          char* cpumask,
-                          size_t mask_size) {
+int uv_thread_getaffinity(uv_thread_t* tid, char* cpumask, size_t mask_size) {
   return UV_ENOTSUP;
 }
 #endif /* defined(__linux__) || defined(UV_BSD_H) */
@@ -291,7 +286,7 @@ uv_thread_t uv_thread_self(void) {
   return pthread_self();
 }
 
-int uv_thread_join(uv_thread_t *tid) {
+int uv_thread_join(uv_thread_t* tid) {
   return UV__ERR(pthread_join(*tid, NULL));
 }
 
@@ -469,7 +464,7 @@ int uv_sem_init(uv_sem_t* sem, unsigned int value) {
     return UV_ENOMEM;
 
   abort();
-  return UV_EINVAL;  /* Satisfy the compiler. */
+  return UV_EINVAL; /* Satisfy the compiler. */
 }
 
 
@@ -511,12 +506,12 @@ int uv_sem_trywait(uv_sem_t* sem) {
     return UV_EAGAIN;
 
   abort();
-  return UV_EINVAL;  /* Satisfy the compiler. */
+  return UV_EINVAL; /* Satisfy the compiler. */
 }
 
 #else /* !(defined(__APPLE__) && defined(__MACH__)) */
 
-#if defined(__GLIBC__) && !defined(__UCLIBC__)
+# if defined(__GLIBC__) && !defined(__UCLIBC__)
 
 /* Hack around https://sourceware.org/bugzilla/show_bug.cgi?id=12674
  * by providing a custom implementation for glibc < 2.21 in terms of other
@@ -531,20 +526,19 @@ static int platform_needs_custom_semaphore = 0;
 
 static void glibc_version_check(void) {
   const char* version = gnu_get_libc_version();
-  platform_needs_custom_semaphore =
-      version[0] == '2' && version[1] == '.' &&
-      atoi(version + 2) < 21;
+  platform_needs_custom_semaphore = version[0] == '2' && version[1] == '.' &&
+                                    atoi(version + 2) < 21;
 }
 
-#elif defined(__MVS__)
+# elif defined(__MVS__)
 
-#define platform_needs_custom_semaphore 1
+#  define platform_needs_custom_semaphore 1
 
-#else /* !defined(__GLIBC__) && !defined(__MVS__) */
+# else /* !defined(__GLIBC__) && !defined(__MVS__) */
 
-#define platform_needs_custom_semaphore 0
+#  define platform_needs_custom_semaphore 0
 
-#endif
+# endif
 
 typedef struct uv_semaphore_s {
   uv_mutex_t mutex;
@@ -552,10 +546,10 @@ typedef struct uv_semaphore_s {
   unsigned int value;
 } uv_semaphore_t;
 
-#if (defined(__GLIBC__) && !defined(__UCLIBC__)) || \
-    platform_needs_custom_semaphore
+# if (defined(__GLIBC__) && !defined(__UCLIBC__)) ||                          \
+     platform_needs_custom_semaphore
 STATIC_ASSERT(sizeof(uv_sem_t) >= sizeof(uv_semaphore_t*));
-#endif
+# endif
 
 static int uv__custom_sem_init(uv_sem_t* sem_, unsigned int value) {
   int err;
@@ -577,7 +571,7 @@ static int uv__custom_sem_init(uv_sem_t* sem_, unsigned int value) {
   }
 
   sem->value = value;
-  *(uv_semaphore_t**)sem_ = sem;
+  *(uv_semaphore_t**) sem_ = sem;
   return 0;
 }
 
@@ -585,7 +579,7 @@ static int uv__custom_sem_init(uv_sem_t* sem_, unsigned int value) {
 static void uv__custom_sem_destroy(uv_sem_t* sem_) {
   uv_semaphore_t* sem;
 
-  sem = *(uv_semaphore_t**)sem_;
+  sem = *(uv_semaphore_t**) sem_;
   uv_cond_destroy(&sem->cond);
   uv_mutex_destroy(&sem->mutex);
   uv__free(sem);
@@ -595,7 +589,7 @@ static void uv__custom_sem_destroy(uv_sem_t* sem_) {
 static void uv__custom_sem_post(uv_sem_t* sem_) {
   uv_semaphore_t* sem;
 
-  sem = *(uv_semaphore_t**)sem_;
+  sem = *(uv_semaphore_t**) sem_;
   uv_mutex_lock(&sem->mutex);
   sem->value++;
   if (sem->value == 1)
@@ -607,7 +601,7 @@ static void uv__custom_sem_post(uv_sem_t* sem_) {
 static void uv__custom_sem_wait(uv_sem_t* sem_) {
   uv_semaphore_t* sem;
 
-  sem = *(uv_semaphore_t**)sem_;
+  sem = *(uv_semaphore_t**) sem_;
   uv_mutex_lock(&sem->mutex);
   while (sem->value == 0)
     uv_cond_wait(&sem->cond, &sem->mutex);
@@ -619,7 +613,7 @@ static void uv__custom_sem_wait(uv_sem_t* sem_) {
 static int uv__custom_sem_trywait(uv_sem_t* sem_) {
   uv_semaphore_t* sem;
 
-  sem = *(uv_semaphore_t**)sem_;
+  sem = *(uv_semaphore_t**) sem_;
   if (uv_mutex_trylock(&sem->mutex) != 0)
     return UV_EAGAIN;
 
@@ -682,9 +676,9 @@ static int uv__sem_trywait(uv_sem_t* sem) {
 }
 
 int uv_sem_init(uv_sem_t* sem, unsigned int value) {
-#if defined(__GLIBC__) && !defined(__UCLIBC__)
+# if defined(__GLIBC__) && !defined(__UCLIBC__)
   uv_once(&glibc_version_check_once, glibc_version_check);
-#endif
+# endif
 
   if (platform_needs_custom_semaphore)
     return uv__custom_sem_init(sem, value);
@@ -850,13 +844,13 @@ int uv_cond_timedwait(uv_cond_t* cond, uv_mutex_t* mutex, uint64_t timeout) {
   ts.tv_nsec = timeout % NANOSEC;
   r = pthread_cond_timedwait_relative_np(cond, mutex, &ts);
 #else
-#if defined(__MVS__)
+# if defined(__MVS__)
   if (gettimeofday(&tv, NULL))
     abort();
   timeout += tv.tv_sec * NANOSEC + tv.tv_usec * 1e3;
-#else
+# else
   timeout += uv__hrtime(UV_CLOCK_PRECISE);
-#endif
+# endif
   ts.tv_sec = timeout / NANOSEC;
   ts.tv_nsec = timeout % NANOSEC;
   r = pthread_cond_timedwait(cond, mutex, &ts);
@@ -870,7 +864,7 @@ int uv_cond_timedwait(uv_cond_t* cond, uv_mutex_t* mutex, uint64_t timeout) {
     return UV_ETIMEDOUT;
 
   abort();
-  return UV_EINVAL;  /* Satisfy the compiler. */
+  return UV_EINVAL; /* Satisfy the compiler. */
 }
 
 
@@ -933,10 +927,8 @@ int uv__thread_setname(const char* name) {
 }
 #endif
 
-#if (defined(__ANDROID_API__) && __ANDROID_API__ < 26) || \
-    defined(_AIX) || \
-    defined(__MVS__) || \
-    defined(__PASE__)
+#if (defined(__ANDROID_API__) && __ANDROID_API__ < 26) || defined(_AIX) ||    \
+    defined(__MVS__) || defined(__PASE__)
 int uv__thread_getname(uv_thread_t* tid, char* name, size_t size) {
   return UV_ENOSYS;
 }

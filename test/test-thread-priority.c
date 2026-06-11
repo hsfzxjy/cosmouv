@@ -27,19 +27,19 @@
 #include <string.h> /* memset */
 
 #ifdef __POSIX__
-#include <pthread.h>
-#include <errno.h>
+# include <pthread.h>
+# include <errno.h>
 #endif
 
 #ifdef _WIN32
-#include <windows.h>
+# include <windows.h>
 #else
-#include <unistd.h>
+# include <unistd.h>
 #endif
 
 uv_sem_t sem;
 
-static void simple_task(void *args) {
+static void simple_task(void* args) {
   uv_sem_wait(&sem);
   printf("in simple_task\n");
 }
@@ -65,13 +65,13 @@ TEST_IMPL(thread_priority) {
   ASSERT_EQ(priority, THREAD_PRIORITY_NORMAL);
 #else
   ASSERT_OK(pthread_getschedparam(task_id, &policy, &param));
-#ifdef __PASE__
+# ifdef __PASE__
   min = 1;
   max = 127;
-#else
+# else
   min = sched_get_priority_min(policy);
   max = sched_get_priority_max(policy);
-#endif
+# endif
   ASSERT(priority >= min && priority <= max);
 #endif
 

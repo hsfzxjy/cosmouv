@@ -26,8 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHECK_HANDLE(handle) \
-  ASSERT_NE((uv_udp_t*)(handle) == &server || (uv_udp_t*)(handle) == &client, 0)
+#define CHECK_HANDLE(handle)                                                    \
+  ASSERT_NE((uv_udp_t*) (handle) == &server || (uv_udp_t*) (handle) == &client, \
+            0)
 
 static uv_udp_t server;
 static uv_udp_t client;
@@ -41,9 +42,7 @@ static int sv_recv_cb_called;
 static int close_cb_called;
 
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   static char slab[65536];
   CHECK_HANDLE(handle);
   ASSERT_LE(suggested_size, sizeof(slab));
@@ -182,12 +181,7 @@ TEST_IMPL(udp_send_and_recv) {
   /* client sends "PING", expects "PONG" */
   buf = uv_buf_init("PING", 4);
 
-  r = uv_udp_send(&req,
-                  &client,
-                  &buf,
-                  1,
-                  (const struct sockaddr*) &addr,
-                  cl_send_cb);
+  r = uv_udp_send(&req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);
   ASSERT_OK(r);
 
   ASSERT_OK(close_cb_called);

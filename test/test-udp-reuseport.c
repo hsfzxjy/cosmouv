@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(__linux__) && !defined(__FreeBSD__) && \
+#if !defined(__linux__) && !defined(__FreeBSD__) &&                           \
     !defined(__DragonFly__) && !defined(__sun) && !defined(_AIX73)
 
 TEST_IMPL(udp_reuseport) {
@@ -60,7 +60,8 @@ TEST_IMPL(udp_reuseport) {
   /* For platforms where SO_REUSEPORTs don't have the capability of
    * load balancing, specifying both UV_UDP_REUSEADDR and UV_UDP_REUSEPORT
    * in flags will fail, returning an UV_ENOTSUP error. */
-  r = uv_udp_bind(&handle3, (const struct sockaddr*) &addr3,
+  r = uv_udp_bind(&handle3,
+                  (const struct sockaddr*) &addr3,
                   UV_UDP_REUSEADDR | UV_UDP_REUSEPORT);
   ASSERT_EQ(r, UV_ENOTSUP);
 
@@ -71,8 +72,8 @@ TEST_IMPL(udp_reuseport) {
 
 #else
 
-#define NUM_RECEIVING_THREADS 2
-#define MAX_UDP_DATAGRAMS 10
+# define NUM_RECEIVING_THREADS 2
+# define MAX_UDP_DATAGRAMS     10
 
 static uv_udp_t udp_send_handles[MAX_UDP_DATAGRAMS];
 static uv_udp_send_t udp_send_requests[MAX_UDP_DATAGRAMS];
@@ -94,9 +95,7 @@ static uv_udp_t thread_handle2;
 static uv_timer_t thread_timer_handle1;
 static uv_timer_t thread_timer_handle2;
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   buf->base = malloc(suggested_size);
   buf->len = (int) suggested_size;
 }
@@ -174,7 +173,8 @@ static void bind_socket_and_prepare_recv(uv_loop_t* loop, uv_udp_t* handle) {
    * load balancing, specifying both UV_UDP_REUSEADDR and
    * UV_UDP_REUSEPORT in flags is allowed and SO_REUSEPORT will
    * always override the behavior of SO_REUSEADDR. */
-  r = uv_udp_bind(handle, (const struct sockaddr*) &addr,
+  r = uv_udp_bind(handle,
+                  (const struct sockaddr*) &addr,
                   UV_UDP_REUSEADDR | UV_UDP_REUSEPORT);
   ASSERT_OK(r);
 
@@ -215,13 +215,13 @@ TEST_IMPL(udp_reuseport) {
   int r;
   int i;
 
-#if defined(__QEMU__)
+# if defined(__QEMU__)
   /* QEMU's user-mode emulator sometimes runs threads in sequence
    * instead of in parallel and that throws off the test.
    * See https://github.com/libuv/libuv/issues/4777.
    */
   RETURN_SKIP("Unreliable under QEMU");
-#endif  /* defined(__QEMU__) */
+# endif /* defined(__QEMU__) */
 
   if (uv_available_parallelism() < 2)
     RETURN_SKIP("Unreliable without thread parallelism");

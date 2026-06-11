@@ -90,7 +90,8 @@ static void alloc_cb(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
   buf->len = sizeof(base);
 }
 
-static void read_cb(uv_stream_t* tcp, ssize_t nread, const uv_buf_t* buf) {}
+static void read_cb(uv_stream_t* tcp, ssize_t nread, const uv_buf_t* buf) {
+}
 
 static void connection_cb(uv_stream_t* tcp, int status) {
   ASSERT_OK(status);
@@ -126,10 +127,8 @@ TEST_IMPL(tcp_write_in_a_row) {
   ASSERT_OK(uv_ip4_addr("127.0.0.1", TEST_PORT, &addr));
 
   ASSERT_OK(uv_tcp_init(uv_default_loop(), &client));
-  ASSERT_OK(uv_tcp_connect(&connect_req,
-                           &client,
-                           (struct sockaddr*) &addr,
-                           connect_cb));
+  ASSERT_OK(
+      uv_tcp_connect(&connect_req, &client, (struct sockaddr*) &addr, connect_cb));
 
   ASSERT_OK(uv_run(uv_default_loop(), UV_RUN_DEFAULT));
 

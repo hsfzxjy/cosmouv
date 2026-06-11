@@ -32,20 +32,20 @@
 #define UV__EOF     (-4095)
 #define UV__UNKNOWN (-4094)
 
-#define UV__EAI_ADDRFAMILY  (-3000)
-#define UV__EAI_AGAIN       (-3001)
-#define UV__EAI_BADFLAGS    (-3002)
-#define UV__EAI_CANCELED    (-3003)
-#define UV__EAI_FAIL        (-3004)
-#define UV__EAI_FAMILY      (-3005)
-#define UV__EAI_MEMORY      (-3006)
-#define UV__EAI_NODATA      (-3007)
-#define UV__EAI_NONAME      (-3008)
-#define UV__EAI_OVERFLOW    (-3009)
-#define UV__EAI_SERVICE     (-3010)
-#define UV__EAI_SOCKTYPE    (-3011)
-#define UV__EAI_BADHINTS    (-3013)
-#define UV__EAI_PROTOCOL    (-3014)
+#define UV__EAI_ADDRFAMILY (-3000)
+#define UV__EAI_AGAIN      (-3001)
+#define UV__EAI_BADFLAGS   (-3002)
+#define UV__EAI_CANCELED   (-3003)
+#define UV__EAI_FAIL       (-3004)
+#define UV__EAI_FAMILY     (-3005)
+#define UV__EAI_MEMORY     (-3006)
+#define UV__EAI_NODATA     (-3007)
+#define UV__EAI_NONAME     (-3008)
+#define UV__EAI_OVERFLOW   (-3009)
+#define UV__EAI_SERVICE    (-3010)
+#define UV__EAI_SOCKTYPE   (-3011)
+#define UV__EAI_BADHINTS   (-3013)
+#define UV__EAI_PROTOCOL   (-3014)
 
 /* Only map to the system errno on non-Windows platforms. It's apparently
  * a fairly common practice for Windows programmers to redefine errno codes.
@@ -410,11 +410,8 @@
  */
 #if defined(EHOSTDOWN) && !defined(_WIN32)
 # define UV__EHOSTDOWN UV__ERR(EHOSTDOWN)
-#elif defined(__APPLE__) || \
-      defined(__DragonFly__) || \
-      defined(__FreeBSD__) || \
-      defined(__NetBSD__) || \
-      defined(__OpenBSD__)
+#elif defined(__APPLE__) || defined(__DragonFly__) || defined(__FreeBSD__) || \
+    defined(__NetBSD__) || defined(__OpenBSD__)
 # define UV__EHOSTDOWN (-64)
 #else
 # define UV__EHOSTDOWN (-4031)

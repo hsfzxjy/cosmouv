@@ -59,7 +59,7 @@ TEST_IMPL(getnameinfo_basic_ip4) {
   r = uv_getnameinfo(uv_default_loop(),
                      &req,
                      &getnameinfo_req,
-                     (const struct sockaddr*)&addr4,
+                     (const struct sockaddr*) &addr4,
                      0);
   ASSERT_OK(r);
 
@@ -81,7 +81,7 @@ TEST_IMPL(getnameinfo_basic_ip4_sync) {
   ASSERT_OK(uv_getnameinfo(uv_default_loop(),
                            &req,
                            NULL,
-                           (const struct sockaddr*)&addr4,
+                           (const struct sockaddr*) &addr4,
                            0));
   ASSERT_NE(req.host[0], '\0');
   ASSERT_NE(req.service[0], '\0');
@@ -96,7 +96,7 @@ TEST_IMPL(getnameinfo_basic_ip6) {
 #if defined(__QEMU__)
   RETURN_SKIP("Test does not currently work in QEMU");
 #endif
-  
+
   int r;
 
   r = uv_ip6_addr(address_ip6, port, &addr6);
@@ -105,7 +105,7 @@ TEST_IMPL(getnameinfo_basic_ip6) {
   r = uv_getnameinfo(uv_default_loop(),
                      &req,
                      &getnameinfo_req,
-                     (const struct sockaddr*)&addr6,
+                     (const struct sockaddr*) &addr6,
                      0);
   ASSERT_OK(r);
 

@@ -94,12 +94,12 @@ TEST_IMPL(tty) {
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyin_fd));
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyout_fd));
 
-  r = uv_tty_init(loop, &tty_in, ttyin_fd, 1);  /* Readable. */
+  r = uv_tty_init(loop, &tty_in, ttyin_fd, 1); /* Readable. */
   ASSERT_OK(r);
   ASSERT(uv_is_readable((uv_stream_t*) &tty_in));
   ASSERT(!uv_is_writable((uv_stream_t*) &tty_in));
 
-  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0);  /* Writable. */
+  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0); /* Writable. */
   ASSERT_OK(r);
   ASSERT(!uv_is_readable((uv_stream_t*) &tty_out));
   ASSERT(uv_is_writable((uv_stream_t*) &tty_out));
@@ -110,7 +110,7 @@ TEST_IMPL(tty) {
   printf("width=%d height=%d\n", width, height);
 
   if (width == 0 && height == 0) {
-   /* Some environments such as containers or Jenkins behave like this
+    /* Some environments such as containers or Jenkins behave like this
     * sometimes */
     MAKE_VALGRIND_HAPPY(loop);
     return TEST_SKIP;
@@ -154,7 +154,7 @@ static void tty_raw_alloc(uv_handle_t* handle, size_t size, uv_buf_t* buf) {
 
 static void tty_raw_read(uv_stream_t* tty_in, ssize_t nread, const uv_buf_t* buf) {
   if (nread > 0) {
-    ASSERT_EQ(1, nread );
+    ASSERT_EQ(1, nread);
     ASSERT_EQ(buf->base[0], ' ');
     uv_close((uv_handle_t*) tty_in, NULL);
   } else {
@@ -184,12 +184,12 @@ TEST_IMPL(tty_raw) {
   ASSERT_GE(ttyin_fd, 0);
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyin_fd));
 
-  r = uv_tty_init(loop, &tty_in, ttyin_fd, 1);  /* Readable. */
+  r = uv_tty_init(loop, &tty_in, ttyin_fd, 1); /* Readable. */
   ASSERT_OK(r);
   ASSERT(uv_is_readable((uv_stream_t*) &tty_in));
   ASSERT(!uv_is_writable((uv_stream_t*) &tty_in));
 
-  r = uv_read_start((uv_stream_t*)&tty_in, tty_raw_alloc, tty_raw_read);
+  r = uv_read_start((uv_stream_t*) &tty_in, tty_raw_alloc, tty_raw_read);
   ASSERT_OK(r);
 
   /* Give uv_tty_line_read_thread time to block on ReadConsoleW */
@@ -204,7 +204,8 @@ TEST_IMPL(tty_raw) {
   record.Event.KeyEvent.bKeyDown = TRUE;
   record.Event.KeyEvent.wRepeatCount = 1;
   record.Event.KeyEvent.wVirtualKeyCode = VK_SPACE;
-  record.Event.KeyEvent.wVirtualScanCode = MapVirtualKeyW(VK_SPACE, MAPVK_VK_TO_VSC);
+  record.Event.KeyEvent.wVirtualScanCode = MapVirtualKeyW(VK_SPACE,
+                                                          MAPVK_VK_TO_VSC);
   record.Event.KeyEvent.uChar.UnicodeChar = L' ';
   record.Event.KeyEvent.dwControlKeyState = 0;
   WriteConsoleInputW(handle, &record, 1, &written);
@@ -242,7 +243,7 @@ TEST_IMPL(tty_empty_write) {
 
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyout_fd));
 
-  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0);  /* Writable. */
+  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0); /* Writable. */
   ASSERT_OK(r);
   ASSERT(!uv_is_readable((uv_stream_t*) &tty_out));
   ASSERT(uv_is_writable((uv_stream_t*) &tty_out));
@@ -288,7 +289,7 @@ TEST_IMPL(tty_large_write) {
 
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyout_fd));
 
-  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0);  /* Writable. */
+  r = uv_tty_init(loop, &tty_out, ttyout_fd, 0); /* Writable. */
   ASSERT_OK(r);
 
   memset(dummy, '.', sizeof(dummy) - 1);
@@ -326,11 +327,11 @@ TEST_IMPL(tty_raw_cancel) {
   ASSERT_GE(ttyin_fd, 0);
   ASSERT_EQ(UV_TTY, uv_guess_handle(ttyin_fd));
 
-  r = uv_tty_init(uv_default_loop(), &tty_in, ttyin_fd, 1);  /* Readable. */
+  r = uv_tty_init(uv_default_loop(), &tty_in, ttyin_fd, 1); /* Readable. */
   ASSERT_OK(r);
   r = uv_tty_set_mode(&tty_in, UV_TTY_MODE_RAW);
   ASSERT_OK(r);
-  r = uv_read_start((uv_stream_t*)&tty_in, tty_raw_alloc, tty_raw_read);
+  r = uv_read_start((uv_stream_t*) &tty_in, tty_raw_alloc, tty_raw_read);
   ASSERT_OK(r);
 
   r = uv_read_stop((uv_stream_t*) &tty_in);
@@ -361,13 +362,13 @@ TEST_IMPL(tty_file) {
   }
 
 /* Bug on AIX where '/dev/random' returns 1 from isatty() */
-#ifndef _AIX
+# ifndef _AIX
   fd = open("/dev/random", O_RDONLY);
   if (fd != -1) {
     ASSERT_EQ(UV_EINVAL, uv_tty_init(&loop, &tty, fd, 1));
     ASSERT_OK(close(fd));
   }
-#endif /* _AIX */
+# endif /* _AIX */
 
   fd = open("/dev/zero", O_RDONLY);
   if (fd != -1) {
@@ -421,11 +422,8 @@ TEST_IMPL(tty_pty) {
 #if defined(__QEMU__)
   RETURN_SKIP("Test does not currently work in QEMU");
 #endif
-#if defined(__APPLE__)                            || \
-    defined(__DragonFly__)                        || \
-    defined(__FreeBSD__)                          || \
-    (defined(__linux__) && !defined(__ANDROID__)) || \
-    defined(__NetBSD__)                           || \
+#if defined(__APPLE__) || defined(__DragonFly__) || defined(__FreeBSD__) ||   \
+    (defined(__linux__) && !defined(__ANDROID__)) || defined(__NetBSD__) ||   \
     defined(__OpenBSD__)
   int master_fd, slave_fd, r;
   uv_loop_t loop;
@@ -464,14 +462,14 @@ TEST_IMPL(tty_pty) {
 #if !defined(__ANDROID__) && !defined(_WIN32)
 static int tty_pty_partial_read_count;
 
-static void tty_pty_partial_feeder(void *arg) {
-  static char buf[1<<13];
+static void tty_pty_partial_feeder(void* arg) {
+  static char buf[1 << 13];
   ssize_t n;
   ssize_t r;
   int fd;
   int i;
 
-  fd = *(int *)arg;
+  fd = *(int*) arg;
   memset(buf, 'x', sizeof(buf));
   for (i = 0; i < 8; i++) {
     for (n = 0; n < (int) sizeof(buf); n += r) {
@@ -486,25 +484,23 @@ static void tty_pty_partial_feeder(void *arg) {
 
 static void tty_pty_partial_alloc_cb(uv_handle_t* handle,
                                      size_t suggested_size,
-                                     uv_buf_t *buf) {
-  static char slab[1<<16];
+                                     uv_buf_t* buf) {
+  static char slab[1 << 16];
   *buf = uv_buf_init(slab, sizeof(slab));
 }
 
 static void tty_pty_partial_read_cb(uv_stream_t* stream,
                                     ssize_t nread,
-                                    const uv_buf_t *buf) {
+                                    const uv_buf_t* buf) {
   if (nread > 0)
     tty_pty_partial_read_count += nread;
   else
     uv_close((uv_handle_t*) stream, NULL);
 }
-#endif  /* !defined(__ANDROID__) && !defined(_WIN32) */
+#endif /* !defined(__ANDROID__) && !defined(_WIN32) */
 
 TEST_IMPL(tty_pty_partial) {
-#if !defined(_AIX)        && \
-    !defined(__ANDROID__) && \
-    !defined(__MVS__)     && \
+#if !defined(_AIX) && !defined(__ANDROID__) && !defined(__MVS__) &&           \
     !defined(_WIN32)
   int master_fd, slave_fd;
   uv_tty_t master_tty;

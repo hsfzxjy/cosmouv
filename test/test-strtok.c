@@ -31,39 +31,39 @@ struct strtok_test_case {
   const char* sep;
 };
 
-const char* tokens[] = {
-  "abc",
-  NULL,
+const char* tokens[] = {"abc",
+                        NULL,
 
-  "abc",
-  "abf",
-  NULL,
+                        "abc",
+                        "abf",
+                        NULL,
 
-  "This",
-  "is.a",
-  "test",
-  "of",
-  "the",
-  "string",
-  "tokenizer",
-  "function.",
-  NULL,
+                        "This",
+                        "is.a",
+                        "test",
+                        "of",
+                        "the",
+                        "string",
+                        "tokenizer",
+                        "function.",
+                        NULL,
 
-  "Hello",
-  "This-is-a-nice",
-  "-string",
-  NULL
-};
+                        "Hello",
+                        "This-is-a-nice",
+                        "-string",
+                        NULL};
 
-#define ASSERT_STRCMP(x, y) \
-  ASSERT_NE((x != NULL && y != NULL && strcmp(x, y) == 0) || (x == y && x == NULL), 0)
+#define ASSERT_STRCMP(x, y)                                                   \
+  ASSERT_NE(                                                                  \
+      (x != NULL && y != NULL && strcmp(x, y) == 0) || (x == y && x == NULL), \
+      0)
 
 TEST_IMPL(strtok) {
   struct strtok_test_case tests[] = {
-    { "abc", "" },
-    { "abc.abf", "." },
-    { "This;is.a:test:of=the/string\\tokenizer-function.", "\\/:;=-" },
-    { "Hello This-is-a-nice.-string", " ." },
+      {"abc", ""},
+      {"abc.abf", "."},
+      {"This;is.a:test:of=the/string\\tokenizer-function.", "\\/:;=-"},
+      {"Hello This-is-a-nice.-string", " ."},
   };
   size_t tokens_len = ARRAY_SIZE(tokens);
   size_t tests_len = ARRAY_SIZE(tests);

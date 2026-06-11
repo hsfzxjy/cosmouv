@@ -83,7 +83,7 @@ TEST_IMPL(pipe_set_chmod) {
   r = uv_pipe_chmod(&pipe_handle, 12345678);
   ASSERT_EQ(r, UV_EINVAL);
 
-  uv_close((uv_handle_t*)&pipe_handle, NULL);
+  uv_close((uv_handle_t*) &pipe_handle, NULL);
   r = uv_pipe_chmod(&pipe_handle, UV_WRITABLE | UV_READABLE);
   ASSERT_EQ(r, UV_EBADF);
 

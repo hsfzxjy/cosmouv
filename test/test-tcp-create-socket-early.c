@@ -49,11 +49,11 @@ static void on_connection(uv_stream_t* server, int status) {
   r = uv_tcp_init_ex(server->loop, handle, AF_INET);
   ASSERT_OK(r);
 
-  r = uv_accept(server, (uv_stream_t*)handle);
+  r = uv_accept(server, (uv_stream_t*) handle);
   ASSERT_EQ(r, UV_EBUSY);
 
   uv_close((uv_handle_t*) server, NULL);
-  uv_close((uv_handle_t*) handle, (uv_close_cb)free);
+  uv_close((uv_handle_t*) handle, (uv_close_cb) free);
 }
 
 
@@ -123,9 +123,7 @@ TEST_IMPL(tcp_create_early) {
   namelen = sizeof sockname;
   r = uv_tcp_getsockname(&client, (struct sockaddr*) &sockname, &namelen);
   ASSERT_OK(r);
-  ASSERT_OK(memcmp(&addr.sin_addr,
-                   &sockname.sin_addr,
-                   sizeof(addr.sin_addr)));
+  ASSERT_OK(memcmp(&addr.sin_addr, &sockname.sin_addr, sizeof(addr.sin_addr)));
 
   uv_close((uv_handle_t*) &client, NULL);
   uv_run(uv_default_loop(), UV_RUN_DEFAULT);
@@ -163,7 +161,7 @@ TEST_IMPL(tcp_create_early_bad_bind) {
     ASSERT_OK(r);
     ASSERT_EQ(sockname.sin6_family, AF_INET6);
   }
-#else 
+#else
   ASSERT_PTR_NE(fd, INVALID_FD);
 #endif
 

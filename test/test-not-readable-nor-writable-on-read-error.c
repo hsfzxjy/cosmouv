@@ -38,9 +38,7 @@ static void write_cb(uv_write_t* req, int status) {
   ASSERT_OK(status);
 }
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   static char slab[64];
   buf->base = slab;
   buf->len = sizeof(slab);
@@ -72,11 +70,7 @@ static void connect_cb(uv_connect_t* req, int status) {
 
   reset_me = uv_buf_init(reset_me_cmd, sizeof(reset_me_cmd));
 
-  r = uv_write(&write_req,
-               (uv_stream_t*) &tcp_client,
-               &reset_me,
-               1,
-               write_cb);
+  r = uv_write(&write_req, (uv_stream_t*) &tcp_client, &reset_me, 1, write_cb);
 
   ASSERT_OK(r);
 }

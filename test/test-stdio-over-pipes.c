@@ -47,16 +47,14 @@ static void close_cb(uv_handle_t* handle) {
 }
 
 
-static void exit_cb(uv_process_t* process,
-                    int64_t exit_status,
-                    int term_signal) {
+static void exit_cb(uv_process_t* process, int64_t exit_status, int term_signal) {
   printf("exit_cb\n");
   exit_cb_called++;
   ASSERT_OK(exit_status);
   ASSERT_OK(term_signal);
-  uv_close((uv_handle_t*)process, close_cb);
-  uv_close((uv_handle_t*)&in, close_cb);
-  uv_close((uv_handle_t*)&out, close_cb);
+  uv_close((uv_handle_t*) process, close_cb);
+  uv_close((uv_handle_t*) &in, close_cb);
+  uv_close((uv_handle_t*) &out, close_cb);
 }
 
 
@@ -73,9 +71,7 @@ static void init_process_options(char* test, uv_exit_cb exit_cb) {
 }
 
 
-static void on_alloc(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void on_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   buf->base = output + output_used;
   buf->len = OUTPUT_SIZE - output_used;
 }
@@ -130,10 +126,10 @@ static void test_stdio_over_pipes(int overlapped) {
 
   options.stdio = stdio;
   options.stdio[0].flags = UV_CREATE_PIPE | UV_READABLE_PIPE |
-      (overlapped ?  UV_OVERLAPPED_PIPE : 0);
+                           (overlapped ? UV_OVERLAPPED_PIPE : 0);
   options.stdio[0].data.stream = (uv_stream_t*) &in;
   options.stdio[1].flags = UV_CREATE_PIPE | UV_WRITABLE_PIPE |
-      (overlapped ? UV_OVERLAPPED_PIPE : 0);
+                           (overlapped ? UV_OVERLAPPED_PIPE : 0);
   options.stdio[1].data.stream = (uv_stream_t*) &out;
   options.stdio[2].flags = UV_INHERIT_FD;
   options.stdio[2].data.fd = 2;
@@ -205,15 +201,7 @@ static void on_read_alloc(uv_handle_t* handle,
 
 int stdio_over_pipes_helper(void) {
   /* Write several buffers to test that the write order is preserved. */
-  char* buffers[] = {
-    "he",
-    "ll",
-    "o ",
-    "wo",
-    "rl",
-    "d",
-    "\n"
-  };
+  char* buffers[] = {"he", "ll", "o ", "wo", "rl", "d", "\n"};
 
   uv_write_t write_req[ARRAY_SIZE(buffers)];
   uv_buf_t buf[ARRAY_SIZE(buffers)];
@@ -283,10 +271,10 @@ int stdio_over_pipes_helper(void) {
     ASSERT_OK(close_cb_called);
   }
 
-  uv_close((uv_handle_t*)&stdin_pipe1, close_cb);
-  uv_close((uv_handle_t*)&stdout_pipe1, close_cb);
-  uv_close((uv_handle_t*)&stdin_pipe2, close_cb);
-  uv_close((uv_handle_t*)&stdout_pipe2, close_cb);
+  uv_close((uv_handle_t*) &stdin_pipe1, close_cb);
+  uv_close((uv_handle_t*) &stdout_pipe1, close_cb);
+  uv_close((uv_handle_t*) &stdin_pipe2, close_cb);
+  uv_close((uv_handle_t*) &stdout_pipe2, close_cb);
 
   uv_run(loop, UV_RUN_DEFAULT);
 

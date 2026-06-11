@@ -53,7 +53,7 @@
 #include <sys/pollset.h>
 #include <ctype.h>
 #ifdef HAVE_SYS_AHAFS_EVPRODS_H
-#include <sys/ahafs_evProds.h>
+# include <sys/ahafs_evProds.h>
 #endif
 
 #include <sys/mntctl.h>
@@ -62,8 +62,8 @@
 #include <strings.h>
 #include <sys/vnode.h>
 
-#define RDWR_BUF_SIZE   4096
-#define EQ(a,b)         (strcmp(a,b) == 0)
+#define RDWR_BUF_SIZE 4096
+#define EQ(a, b)      (strcmp(a, b) == 0)
 
 char* original_exepath = NULL;
 uv_mutex_t process_title_mutex;
@@ -116,7 +116,7 @@ int uv__io_check_fd(uv_loop_t* loop, int fd) {
   struct poll_ctl pc;
 
   pc.events = POLLIN;
-  pc.cmd = PS_MOD;  /* Equivalent to PS_ADD if the fd is not in the pollset. */
+  pc.cmd = PS_MOD; /* Equivalent to PS_ADD if the fd is not in the pollset. */
   pc.fd = fd;
 
   if (pollset_ctl(loop->backend_fd, &pc, 1))
@@ -230,10 +230,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
 
   for (;;) {
     uv__io_poll_prepare(loop, NULL, timeout);
-    nfds = pollset_poll(loop->backend_fd,
-                        events,
-                        ARRAY_SIZE(events),
-                        timeout);
+    nfds = pollset_poll(loop->backend_fd, events, ARRAY_SIZE(events), timeout);
     uv__io_poll_check(loop, NULL);
 
     if (nfds == 0) {
@@ -330,7 +327,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
     loop->watchers[loop->nwatchers + 1] = NULL;
 
     if (have_signals != 0)
-      return;  /* Event loop should cycle now so don't poll again. */
+      return; /* Event loop should cycle now so don't poll again. */
 
     if (nevents != 0) {
       if (nfds == ARRAY_SIZE(events) && --count != 0) {
@@ -347,7 +344,7 @@ void uv__io_poll(uv_loop_t* loop, int timeout) {
     if (timeout == -1)
       continue;
 
-update_timeout:
+  update_timeout:
     assert(timeout > 0);
 
     diff = loop->time - base;
@@ -393,17 +390,19 @@ void uv_loadavg(double avg[3]) {
   perfstat_cpu_total_t ps_total;
   int result = perfstat_cpu_total(NULL, &ps_total, sizeof(ps_total), 1);
   if (result == -1) {
-    avg[0] = 0.; avg[1] = 0.; avg[2] = 0.;
+    avg[0] = 0.;
+    avg[1] = 0.;
+    avg[2] = 0.;
     return;
   }
-  avg[0] = ps_total.loadavg[0] / (double)(1 << SBITS);
-  avg[1] = ps_total.loadavg[1] / (double)(1 << SBITS);
-  avg[2] = ps_total.loadavg[2] / (double)(1 << SBITS);
+  avg[0] = ps_total.loadavg[0] / (double) (1 << SBITS);
+  avg[1] = ps_total.loadavg[1] / (double) (1 << SBITS);
+  avg[2] = ps_total.loadavg[2] / (double) (1 << SBITS);
 }
 
 
 #ifdef HAVE_SYS_AHAFS_EVPRODS_H
-static char* uv__rawname(const char* cp, char (*dst)[FILENAME_MAX+1]) {
+static char* uv__rawname(const char* cp, char (*dst)[FILENAME_MAX + 1]) {
   char* dp;
 
   dp = rindex(cp, '/');
@@ -426,7 +425,7 @@ static int uv__path_is_a_directory(char* filename) {
   struct stat statbuf;
 
   if (uv__stat(filename, &statbuf) < 0)
-    return -1;  /* failed: not a directory, assume it is a file */
+    return -1; /* failed: not a directory, assume it is a file */
 
   if (statbuf.st_type == VDIR)
     return 0;
@@ -439,14 +438,14 @@ static int uv__path_is_a_directory(char* filename) {
  * Check whether AHAFS is mounted.
  * Returns 0 if AHAFS is mounted, or an error code < 0 on failure
  */
-static int uv__is_ahafs_mounted(void){
-  char rawbuf[FILENAME_MAX+1];
+static int uv__is_ahafs_mounted(void) {
+  char rawbuf[FILENAME_MAX + 1];
   int rv, i = 2;
-  struct vmount *p;
+  struct vmount* p;
   int size_multiplier = 10;
-  size_t siz = sizeof(struct vmount)*size_multiplier;
-  struct vmount *vmt;
-  const char *dev = "/aha";
+  size_t siz = sizeof(struct vmount) * size_multiplier;
+  struct vmount* vmt;
+  const char* dev = "/aha";
   char *obj, *stub;
 
   p = uv__malloc(siz);
@@ -454,31 +453,31 @@ static int uv__is_ahafs_mounted(void){
     return UV__ERR(errno);
 
   /* Retrieve all mounted filesystems */
-  rv = mntctl(MCTL_QUERY, siz, (char*)p);
+  rv = mntctl(MCTL_QUERY, siz, (char*) p);
   if (rv < 0)
     return UV__ERR(errno);
   if (rv == 0) {
     /* buffer was not large enough, reallocate to correct size */
-    siz = *(int*)p;
+    siz = *(int*) p;
     uv__free(p);
     p = uv__malloc(siz);
     if (p == NULL)
       return UV__ERR(errno);
-    rv = mntctl(MCTL_QUERY, siz, (char*)p);
+    rv = mntctl(MCTL_QUERY, siz, (char*) p);
     if (rv < 0)
       return UV__ERR(errno);
   }
 
   /* Look for dev in filesystems mount info */
-  for(vmt = p, i = 0; i < rv; i++) {
-    obj = vmt2dataptr(vmt, VMT_OBJECT);     /* device */
-    stub = vmt2dataptr(vmt, VMT_STUB);      /* mount point */
+  for (vmt = p, i = 0; i < rv; i++) {
+    obj = vmt2dataptr(vmt, VMT_OBJECT); /* device */
+    stub = vmt2dataptr(vmt, VMT_STUB);  /* mount point */
 
     if (EQ(obj, dev) || EQ(uv__rawname(obj, &rawbuf), dev) || EQ(stub, dev)) {
-      uv__free(p);  /* Found a match */
+      uv__free(p); /* Found a match */
       return 0;
     }
-    vmt = (struct vmount *) ((char *) vmt + vmt->vmt_length);
+    vmt = (struct vmount*) ((char*) vmt + vmt->vmt_length);
   }
 
   /* /aha is required for monitoring filesystem changes */
@@ -489,9 +488,9 @@ static int uv__is_ahafs_mounted(void){
  * Recursive call to mkdir() to create intermediate folders, if any
  * Returns code from mkdir call
  */
-static int uv__makedir_p(const char *dir) {
+static int uv__makedir_p(const char* dir) {
   char tmp[256];
-  char *p = NULL;
+  char* p = NULL;
   size_t len;
   int err;
 
@@ -517,9 +516,9 @@ static int uv__makedir_p(const char *dir) {
  * file system for monitoring the object specified.
  * Returns code from mkdir call
  */
-static int uv__make_subdirs_p(const char *filename) {
+static int uv__make_subdirs_p(const char* filename) {
   char cmd[2048];
-  char *p;
+  char* p;
   int rc = 0;
 
   /* Strip off the monitor file name */
@@ -528,7 +527,7 @@ static int uv__make_subdirs_p(const char *filename) {
   if (p == NULL)
     return 0;
 
-  if (uv__path_is_a_directory((char*)filename) == 0) {
+  if (uv__path_is_a_directory((char*) filename) == 0) {
     sprintf(cmd, "/aha/fs/modDir.monFactory");
   } else {
     sprintf(cmd, "/aha/fs/modFile.monFactory");
@@ -537,7 +536,7 @@ static int uv__make_subdirs_p(const char *filename) {
   strncat(cmd, filename, (p - filename));
   rc = uv__makedir_p(cmd);
 
-  if (rc == -1 && errno != EEXIST){
+  if (rc == -1 && errno != EEXIST) {
     return UV__ERR(errno);
   }
 
@@ -550,14 +549,14 @@ static int uv__make_subdirs_p(const char *filename) {
  * objects for the specified file.
  * Returns 0 on success, or an error code < 0 on failure
  */
-static int uv__setup_ahafs(const char* filename, int *fd) {
+static int uv__setup_ahafs(const char* filename, int* fd) {
   int rc = 0;
   char mon_file_write_string[RDWR_BUF_SIZE];
   char mon_file[PATH_MAX];
   int file_is_directory = 0; /* -1 == NO, 0 == YES  */
 
   /* Create monitor file name for object */
-  file_is_directory = uv__path_is_a_directory((char*)filename);
+  file_is_directory = uv__path_is_a_directory((char*) filename);
 
   if (file_is_directory == 0)
     sprintf(mon_file, "/aha/fs/modDir.monFactory");
@@ -575,10 +574,11 @@ static int uv__setup_ahafs(const char* filename, int *fd) {
   strcat(mon_file, filename);
   strcat(mon_file, ".mon");
 
-  *fd = 0; errno = 0;
+  *fd = 0;
+  errno = 0;
 
   /* Open the monitor file, creating it if necessary */
-  *fd = open(mon_file, O_CREAT|O_RDWR);
+  *fd = open(mon_file, O_CREAT | O_RDWR);
   if (*fd < 0)
     return UV__ERR(errno);
 
@@ -595,11 +595,13 @@ static int uv__setup_ahafs(const char* filename, int *fd) {
    */
 
   if (file_is_directory == 0)
-    sprintf(mon_file_write_string, "CHANGED=YES;WAIT_TYPE=WAIT_IN_SELECT;INFO_LVL=2");
+    sprintf(mon_file_write_string,
+            "CHANGED=YES;WAIT_TYPE=WAIT_IN_SELECT;INFO_LVL=2");
   else
-    sprintf(mon_file_write_string, "CHANGED=YES;WAIT_TYPE=WAIT_IN_SELECT;INFO_LVL=1");
+    sprintf(mon_file_write_string,
+            "CHANGED=YES;WAIT_TYPE=WAIT_IN_SELECT;INFO_LVL=1");
 
-  rc = write(*fd, mon_file_write_string, strlen(mon_file_write_string)+1);
+  rc = write(*fd, mon_file_write_string, strlen(mon_file_write_string) + 1);
   if (rc < 0 && errno != EBUSY)
     return UV__ERR(errno);
 
@@ -611,10 +613,10 @@ static int uv__setup_ahafs(const char* filename, int *fd) {
  * Walks the buffer pointed to by p and attempts to skip n lines.
  * Returns the total number of lines skipped
  */
-static int uv__skip_lines(char **p, int n) {
+static int uv__skip_lines(char** p, int n) {
   int lines = 0;
 
-  while(n > 0) {
+  while (n > 0) {
     *p = strchr(*p, '\n');
     if (!*p)
       return lines;
@@ -635,16 +637,16 @@ static int uv__skip_lines(char **p, int n) {
  * Returns 0 on success, -1 if unrecoverable error in parsing
  *
  */
-static int uv__parse_data(char *buf, int *events, uv_fs_event_t* handle) {
-  int    evp_rc, i;
-  char   *p;
-  char   filename[PATH_MAX]; /* To be used when handling directories */
+static int uv__parse_data(char* buf, int* events, uv_fs_event_t* handle) {
+  int evp_rc, i;
+  char* p;
+  char filename[PATH_MAX]; /* To be used when handling directories */
 
   p = buf;
   *events = 0;
 
   /* Clean the filename buffer*/
-  for(i = 0; i < PATH_MAX; i++) {
+  for (i = 0; i < PATH_MAX; i++) {
     filename[i] = 0;
   }
   i = 0;
@@ -681,18 +683,17 @@ static int uv__parse_data(char *buf, int *events, uv_fs_event_t* handle) {
 
         /* Scan out the name of the file that triggered the event*/
         if (sscanf(p, "BEGIN_EVPROD_INFO\n%sEND_EVPROD_INFO", filename) == 1) {
-          handle->dir_filename = uv__strdup((const char*)&filename);
+          handle->dir_filename = uv__strdup((const char*) &filename);
         } else
           return -1;
-        }
+      }
     } else { /* Regular File */
       if (evp_rc == AHAFS_MODFILE_RENAME)
         *events = UV_RENAME;
       else
         *events = UV_CHANGE;
     }
-  }
-  else
+  } else
     return -1;
 
   return 0;
@@ -701,12 +702,12 @@ static int uv__parse_data(char *buf, int *events, uv_fs_event_t* handle) {
 
 /* This is the internal callback */
 void uv__ahafs_event(uv_loop_t* loop, uv__io_t* event_watch, unsigned int fflags) {
-  char   result_data[RDWR_BUF_SIZE];
+  char result_data[RDWR_BUF_SIZE];
   int bytes, rc = 0;
   uv_fs_event_t* handle;
   int events = 0;
   char fname[PATH_MAX];
-  char *p;
+  char* p;
 
   handle = container_of(event_watch, uv_fs_event_t, event_watcher);
 
@@ -722,11 +723,11 @@ void uv__ahafs_event(uv_loop_t* loop, uv__io_t* event_watch, unsigned int fflags
    * produces a second event with no data.
    * Ignore it and return gracefully.
    */
-  if(bytes == 0)
+  if (bytes == 0)
     return;
 
   /* Parse the data */
-  if(bytes > 0)
+  if (bytes > 0)
     rc = uv__parse_data(result_data, &events, handle);
 
   /* Unrecoverable error */
@@ -755,12 +756,12 @@ void uv__ahafs_event(uv_loop_t* loop, uv__io_t* event_watch, unsigned int fflags
 void uv__ahafs_event(uv_loop_t* loop, uv__io_t* event_watch, unsigned int fflags) {
   /* Stub function to satisfy the linker. */
 }
-#endif  /* HAVE_SYS_AHAFS_EVPRODS_H */
+#endif /* HAVE_SYS_AHAFS_EVPRODS_H */
 
 
 int uv_fs_event_init(uv_loop_t* loop, uv_fs_event_t* handle) {
 #ifdef HAVE_SYS_AHAFS_EVPRODS_H
-  uv__handle_init(loop, (uv_handle_t*)handle, UV_FS_EVENT);
+  uv__handle_init(loop, (uv_handle_t*) handle, UV_FS_EVENT);
   return 0;
 #else
   return UV_ENOSYS;
@@ -773,7 +774,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
                       const char* filename,
                       unsigned int flags) {
 #ifdef HAVE_SYS_AHAFS_EVPRODS_H
-  int  fd, rc, str_offset = 0;
+  int fd, rc, str_offset = 0;
   char cwd[PATH_MAX];
   char absolute_path[PATH_MAX];
   char readlink_cwd[PATH_MAX];
@@ -785,8 +786,7 @@ int uv_fs_event_start(uv_fs_event_t* handle,
   if (filename[0] == '\0') {
     /* Missing a pathname */
     return UV_ENOENT;
-  }
-  else if (filename[0] == '/') {
+  } else if (filename[0] == '/') {
     /* We have absolute pathname */
     /* TODO(bnoordhuis) Check uv__strscpy() return value. */
     uv__strscpy(absolute_path, filename, sizeof(absolute_path));
@@ -802,15 +802,18 @@ int uv_fs_event_start(uv_fs_event_t* handle,
     if (filename[0] == '.' && filename[1] == '/')
       str_offset = 2;
 
-    snprintf(absolute_path, sizeof(absolute_path), "%s%s", readlink_cwd,
+    snprintf(absolute_path,
+             sizeof(absolute_path),
+             "%s%s",
+             readlink_cwd,
              filename + str_offset);
   }
 
-  if (uv__is_ahafs_mounted() < 0)  /* /aha checks failed */
+  if (uv__is_ahafs_mounted() < 0) /* /aha checks failed */
     return UV_ENOSYS;
 
   /* Setup ahafs */
-  rc = uv__setup_ahafs((const char *)absolute_path, &fd);
+  rc = uv__setup_ahafs((const char*) absolute_path, &fd);
   if (rc != 0)
     return rc;
 
@@ -894,7 +897,7 @@ char** uv_setup_args(int argc, char** argv) {
   size = sizeof(exepath);
   if (uv__search_path(argv[0], exepath, &size) == 0) {
     uv_once(&process_title_mutex_once, init_process_title_mutex_once);
-    uv_mutex_lock(&process_title_mutex); 
+    uv_mutex_lock(&process_title_mutex);
     original_exepath = uv__strdup(exepath);
     uv_mutex_unlock(&process_title_mutex);
   }
@@ -953,7 +956,7 @@ int uv_set_process_title(const char* title) {
 
   process_argv[0] = process_title_ptr;
   if (process_argc > 1)
-     process_argv[1] = NULL;
+    process_argv[1] = NULL;
 
   uv_mutex_unlock(&process_title_mutex);
 
@@ -989,7 +992,7 @@ int uv_get_process_title(char* buffer, size_t size) {
 
 
 void uv__process_title_cleanup(void) {
-  uv__free(args_mem);  /* Keep valgrind happy. */
+  uv__free(args_mem); /* Keep valgrind happy. */
   args_mem = NULL;
 }
 
@@ -1009,7 +1012,7 @@ int uv_resident_set_memory(size_t* rss) {
   /* FIXME(bnoordhuis) Handle EINTR. */
   err = UV_EINVAL;
   if (read(fd, &psinfo, sizeof(psinfo)) == sizeof(psinfo)) {
-    *rss = (size_t)psinfo.pr_rssize * 1024;
+    *rss = (size_t) psinfo.pr_rssize * 1024;
     err = 0;
   }
   uv__close(fd);
@@ -1019,7 +1022,7 @@ int uv_resident_set_memory(size_t* rss) {
 
 
 int uv_uptime(double* uptime) {
-  struct utmp *utmp_buf;
+  struct utmp* utmp_buf;
   size_t entries = 0;
   time_t boot_time;
 
@@ -1085,7 +1088,7 @@ int uv_cpu_info(uv_cpu_info_t** cpu_infos, int* count) {
 
   cpu_info = *cpu_infos;
   while (idx < ncpus) {
-    cpu_info->speed = (int)(ps_total.processorHZ / 1000000);
+    cpu_info->speed = (int) (ps_total.processorHZ / 1000000);
     cpu_info->model = uv__strdup(ps_total.description);
     cpu_info->cpu_times.user = ps_cpus[idx].user;
     cpu_info->cpu_times.sys = ps_cpus[idx].sys;
@@ -1132,7 +1135,7 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
     goto cleanup;
   }
 
-  ifc.ifc_req = (struct ifreq*)uv__malloc(size);
+  ifc.ifc_req = (struct ifreq*) uv__malloc(size);
   if (ifc.ifc_req == NULL) {
     r = UV_ENOMEM;
     goto cleanup;
@@ -1148,13 +1151,12 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
   /* Count all up and running ipv4/ipv6 addresses */
   namelen = 0;
   ifr = ifc.ifc_req;
-  while ((char*)ifr < (char*)ifc.ifc_req + ifc.ifc_len) {
+  while ((char*) ifr < (char*) ifc.ifc_req + ifc.ifc_len) {
     p = ifr;
-    ifr = (struct ifreq*)
-      ((char*)ifr + sizeof(ifr->ifr_name) + ADDR_SIZE(ifr->ifr_addr));
+    ifr = (struct ifreq*) ((char*) ifr + sizeof(ifr->ifr_name) +
+                           ADDR_SIZE(ifr->ifr_addr));
 
-    if (!(p->ifr_addr.sa_family == AF_INET6 ||
-          p->ifr_addr.sa_family == AF_INET))
+    if (!(p->ifr_addr.sa_family == AF_INET6 || p->ifr_addr.sa_family == AF_INET))
       continue;
 
     memcpy(flg.ifr_name, p->ifr_name, sizeof(flg.ifr_name));
@@ -1183,13 +1185,12 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
   address = *addresses;
 
   ifr = ifc.ifc_req;
-  while ((char*)ifr < (char*)ifc.ifc_req + ifc.ifc_len) {
+  while ((char*) ifr < (char*) ifc.ifc_req + ifc.ifc_len) {
     p = ifr;
-    ifr = (struct ifreq*)
-      ((char*)ifr + sizeof(ifr->ifr_name) + ADDR_SIZE(ifr->ifr_addr));
+    ifr = (struct ifreq*) ((char*) ifr + sizeof(ifr->ifr_name) +
+                           ADDR_SIZE(ifr->ifr_addr));
 
-    if (!(p->ifr_addr.sa_family == AF_INET6 ||
-          p->ifr_addr.sa_family == AF_INET))
+    if (!(p->ifr_addr.sa_family == AF_INET6 || p->ifr_addr.sa_family == AF_INET))
       continue;
 
     inet6 = (p->ifr_addr.sa_family == AF_INET6);
@@ -1239,10 +1240,10 @@ int uv_interface_addresses(uv_interface_address_t** addresses, int* count) {
 
   /* Fill in physical addresses. */
   ifr = ifc.ifc_req;
-  while ((char*)ifr < (char*)ifc.ifc_req + ifc.ifc_len) {
+  while ((char*) ifr < (char*) ifc.ifc_req + ifc.ifc_len) {
     p = ifr;
-    ifr = (struct ifreq*)
-      ((char*)ifr + sizeof(ifr->ifr_name) + ADDR_SIZE(ifr->ifr_addr));
+    ifr = (struct ifreq*) ((char*) ifr + sizeof(ifr->ifr_name) +
+                           ADDR_SIZE(ifr->ifr_addr));
 
     if (p->ifr_addr.sa_family != AF_LINK)
       continue;
@@ -1298,6 +1299,6 @@ void uv__platform_invalidate_fd(uv_loop_t* loop, int fd) {
   pc.events = 0;
   pc.cmd = PS_DELETE;
   pc.fd = fd;
-  if(loop->backend_fd >= 0)
+  if (loop->backend_fd >= 0)
     pollset_ctl(loop->backend_fd, &pc, 1);
 }

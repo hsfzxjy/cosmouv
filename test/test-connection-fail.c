@@ -58,24 +58,24 @@ static void timer_cb(uv_timer_t* handle) {
   ASSERT_EQ(1, connect_cb_calls);
 
   /* Close the tcp handle. */
-  uv_close((uv_handle_t*)&tcp, on_close);
+  uv_close((uv_handle_t*) &tcp, on_close);
 
   /* Close the timer. */
-  uv_close((uv_handle_t*)handle, timer_close_cb);
+  uv_close((uv_handle_t*) handle, timer_close_cb);
 }
 
 
-static void on_connect_with_close(uv_connect_t *req, int status) {
+static void on_connect_with_close(uv_connect_t* req, int status) {
   ASSERT_PTR_EQ((uv_stream_t*) &tcp, req->handle);
   ASSERT_EQ(status, UV_ECONNREFUSED);
   connect_cb_calls++;
 
   ASSERT_OK(close_cb_calls);
-  uv_close((uv_handle_t*)req->handle, on_close);
+  uv_close((uv_handle_t*) req->handle, on_close);
 }
 
 
-static void on_connect_without_close(uv_connect_t *req, int status) {
+static void on_connect_without_close(uv_connect_t* req, int status) {
   ASSERT_EQ(status, UV_ECONNREFUSED);
   connect_cb_calls++;
 
@@ -102,10 +102,7 @@ static void connection_fail(uv_connect_cb connect_cb) {
    * handles can be pre-initialized. */
   ASSERT_OK(uv_tcp_bind(&tcp, (const struct sockaddr*) &client_addr, 0));
 
-  r = uv_tcp_connect(&req,
-                     &tcp,
-                     (const struct sockaddr*) &server_addr,
-                     connect_cb);
+  r = uv_tcp_connect(&req, &tcp, (const struct sockaddr*) &server_addr, connect_cb);
   ASSERT(!r);
 
   uv_run(uv_default_loop(), UV_RUN_DEFAULT);

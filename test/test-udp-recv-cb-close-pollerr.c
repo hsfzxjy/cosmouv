@@ -33,8 +33,11 @@ static void alloc_cb(uv_handle_t* handle, size_t sz, uv_buf_t* buf) {
   buf->len = 2;
 }
 
-static void recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* buf,
-                    const struct sockaddr* addr, unsigned flags) {
+static void recv_cb(uv_udp_t* handle,
+                    ssize_t nread,
+                    const uv_buf_t* buf,
+                    const struct sockaddr* addr,
+                    unsigned flags) {
   recv_cb_called++;
   /* Stop receiving and unset recv_cb and alloc_cb */
   uv_close((uv_handle_t*) handle, NULL);
@@ -60,7 +63,8 @@ TEST_IMPL(udp_recv_cb_close_pollerr) {
   ASSERT_OK(uv_udp_init(uv_default_loop(), &client));
 
   ASSERT_OK(uv_ip4_addr("0.0.0.0", 0, &any_addr));
-  ASSERT_OK(uv_udp_bind(&client, (const struct sockaddr*) &any_addr,
+  ASSERT_OK(uv_udp_bind(&client,
+                        (const struct sockaddr*) &any_addr,
                         UV_UDP_LINUX_RECVERR));
 
   ASSERT_OK(uv_ip4_addr("127.0.0.1", 9999, &addr));
@@ -94,7 +98,8 @@ TEST_IMPL(udp_send_pollerr_no_recv) {
   ASSERT_OK(uv_udp_init(uv_default_loop(), &client));
 
   ASSERT_OK(uv_ip4_addr("0.0.0.0", 0, &any_addr));
-  ASSERT_OK(uv_udp_bind(&client, (const struct sockaddr*) &any_addr,
+  ASSERT_OK(uv_udp_bind(&client,
+                        (const struct sockaddr*) &any_addr,
                         UV_UDP_LINUX_RECVERR));
 
   ASSERT_OK(uv_ip4_addr("127.0.0.1", 9999, &addr));

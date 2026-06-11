@@ -26,9 +26,7 @@
 #include <string.h>
 
 /* See test-ipc.c */
-void spawn_helper(uv_pipe_t* channel,
-                  uv_process_t* process,
-                  const char* helper);
+void spawn_helper(uv_pipe_t* channel, uv_process_t* process, const char* helper);
 
 void ipc_send_recv_helper_threadproc(void* arg);
 
@@ -73,9 +71,7 @@ static int recv_cb_count;
 static int write2_cb_called;
 
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   /* We're not actually reading anything so a small buffer is okay
    * but it needs to be heap-allocated to appease TSan.
    */
@@ -85,9 +81,7 @@ static void alloc_cb(uv_handle_t* handle,
 }
 
 
-static void recv_cb(uv_stream_t* handle,
-                    ssize_t nread,
-                    const uv_buf_t* buf) {
+static void recv_cb(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf) {
   uv_handle_type pending;
   uv_pipe_t* pipe;
   int r;
@@ -135,7 +129,7 @@ static void recv_cb(uv_stream_t* handle,
 
   /* Close after two writes received */
   if (recv_cb_count == 2) {
-    uv_close((uv_handle_t*)&ctx.channel, NULL);
+    uv_close((uv_handle_t*) &ctx.channel, NULL);
   }
 }
 
@@ -148,8 +142,9 @@ static void connect_cb(uv_connect_t* req, int status) {
 
   buf = uv_buf_init(".", 1);
   r = uv_write2(&ctx.write_req,
-                (uv_stream_t*)&ctx.channel,
-                &buf, 1,
+                (uv_stream_t*) &ctx.channel,
+                &buf,
+                1,
                 &ctx.send.stream,
                 NULL);
   ASSERT_OK(r);
@@ -159,13 +154,14 @@ static void connect_cb(uv_connect_t* req, int status) {
    *   https://github.com/libuv/libuv/issues/505 */
   buf = uv_buf_init(".", 1);
   r = uv_write2(&ctx.write_req2,
-                (uv_stream_t*)&ctx.channel,
-                &buf, 1,
+                (uv_stream_t*) &ctx.channel,
+                &buf,
+                1,
                 &ctx.send2.stream,
                 NULL);
   ASSERT_OK(r);
 
-  r = uv_read_start((uv_stream_t*)&ctx.channel, alloc_cb, recv_cb);
+  r = uv_read_start((uv_stream_t*) &ctx.channel, alloc_cb, recv_cb);
   ASSERT_OK(r);
 }
 
@@ -175,7 +171,7 @@ static int run_test(int inprocess) {
   int r;
 
   if (inprocess) {
-    r = uv_thread_create(&tid, ipc_send_recv_helper_threadproc, (void *) 42);
+    r = uv_thread_create(&tid, ipc_send_recv_helper_threadproc, (void*) 42);
     ASSERT_OK(r);
 
     uv_sleep(1000);
@@ -293,14 +289,12 @@ static void write2_cb(uv_write_t* req, int status) {
   if (++write2_cb_called == 2 && (is_child_process || is_in_process)) {
     uv_close(&ctx2.recv.handle, NULL);
     uv_close(&ctx2.recv2.handle, NULL);
-    uv_close((uv_handle_t*)&ctx2.channel, NULL);
-    uv_close((uv_handle_t*)&ctx2.listen, NULL);
+    uv_close((uv_handle_t*) &ctx2.channel, NULL);
+    uv_close((uv_handle_t*) &ctx2.listen, NULL);
   }
 }
 
-static void read_cb(uv_stream_t* handle,
-                    ssize_t nread,
-                    const uv_buf_t* rdbuf) {
+static void read_cb(uv_stream_t* handle, ssize_t nread, const uv_buf_t* rdbuf) {
   uv_buf_t wrbuf;
   uv_pipe_t* pipe;
   uv_handle_type pending;
@@ -344,7 +338,7 @@ static void read_cb(uv_stream_t* handle,
 
     wrbuf = uv_buf_init(".", 1);
     r = uv_write2(write_req,
-                  (uv_stream_t*)&ctx2.channel,
+                  (uv_stream_t*) &ctx2.channel,
                   &wrbuf,
                   1,
                   &recv->stream,
@@ -355,20 +349,20 @@ static void read_cb(uv_stream_t* handle,
 
 static void send_recv_start(void) {
   int r;
-  ASSERT_EQ(1, uv_is_readable((uv_stream_t*)&ctx2.channel));
-  ASSERT_EQ(1, uv_is_writable((uv_stream_t*)&ctx2.channel));
-  ASSERT_OK(uv_is_closing((uv_handle_t*)&ctx2.channel));
+  ASSERT_EQ(1, uv_is_readable((uv_stream_t*) &ctx2.channel));
+  ASSERT_EQ(1, uv_is_writable((uv_stream_t*) &ctx2.channel));
+  ASSERT_OK(uv_is_closing((uv_handle_t*) &ctx2.channel));
 
-  r = uv_read_start((uv_stream_t*)&ctx2.channel, alloc_cb, read_cb);
+  r = uv_read_start((uv_stream_t*) &ctx2.channel, alloc_cb, read_cb);
   ASSERT_OK(r);
 }
 
 static void listen_cb(uv_stream_t* handle, int status) {
   int r;
-  ASSERT_PTR_EQ(handle, (uv_stream_t*)&ctx2.listen);
+  ASSERT_PTR_EQ(handle, (uv_stream_t*) &ctx2.listen);
   ASSERT_OK(status);
 
-  r = uv_accept((uv_stream_t*)&ctx2.listen, (uv_stream_t*)&ctx2.channel);
+  r = uv_accept((uv_stream_t*) &ctx2.listen, (uv_stream_t*) &ctx2.channel);
   ASSERT_OK(r);
 
   send_recv_start();
@@ -391,7 +385,7 @@ int run_ipc_send_recv_helper(uv_loop_t* loop, int inprocess) {
     r = uv_pipe_bind(&ctx2.listen, TEST_PIPENAME_3);
     ASSERT_OK(r);
 
-    r = uv_listen((uv_stream_t*)&ctx2.listen, SOMAXCONN, listen_cb);
+    r = uv_listen((uv_stream_t*) &ctx2.listen, SOMAXCONN, listen_cb);
     ASSERT_OK(r);
   } else {
     r = uv_pipe_open(&ctx2.channel, 0);

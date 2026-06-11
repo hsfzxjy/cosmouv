@@ -26,11 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHECK_HANDLE(handle) \
-  ASSERT_PTR_EQ((uv_udp_t*)(handle), &handle_)
+#define CHECK_HANDLE(handle) ASSERT_PTR_EQ((uv_udp_t*) (handle), &handle_)
 
-#define CHECK_REQ(req) \
-  ASSERT_PTR_EQ((req), &req_);
+#define CHECK_REQ(req) ASSERT_PTR_EQ((req), &req_);
 
 static uv_udp_t handle_;
 static uv_udp_send_t req_;
@@ -51,7 +49,7 @@ static void send_cb(uv_udp_send_t* req, int status) {
 
   ASSERT_EQ(status, UV_EMSGSIZE);
 
-  uv_close((uv_handle_t*)req->handle, close_cb);
+  uv_close((uv_handle_t*) req->handle, close_cb);
   send_cb_called++;
 }
 
@@ -70,12 +68,7 @@ TEST_IMPL(udp_dgram_too_big) {
   buf = uv_buf_init(dgram, sizeof dgram);
   ASSERT_OK(uv_ip4_addr("127.0.0.1", TEST_PORT, &addr));
 
-  r = uv_udp_send(&req_,
-                  &handle_,
-                  &buf,
-                  1,
-                  (const struct sockaddr*) &addr,
-                  send_cb);
+  r = uv_udp_send(&req_, &handle_, &buf, 1, (const struct sockaddr*) &addr, send_cb);
   ASSERT_OK(r);
 
   ASSERT_OK(close_cb_called);

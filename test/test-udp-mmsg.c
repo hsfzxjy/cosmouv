@@ -26,12 +26,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHECK_HANDLE(handle) \
-  ASSERT_NE((uv_udp_t*)(handle) == &recver || (uv_udp_t*)(handle) == &sender, 0)
+#define CHECK_HANDLE(handle)                                                    \
+  ASSERT_NE((uv_udp_t*) (handle) == &recver || (uv_udp_t*) (handle) == &sender, \
+            0)
 
 #define BUFFER_MULTIPLIER 20
-#define MAX_DGRAM_SIZE (64 * 1024)
-#define NUM_SENDS 40
+#define MAX_DGRAM_SIZE    (64 * 1024)
+#define NUM_SENDS         40
 
 static uv_udp_t recver;
 static uv_udp_t sender;
@@ -42,15 +43,13 @@ static int close_cb_called;
 static int alloc_cb_called;
 
 
-static void alloc_cb(uv_handle_t* handle,
-                     size_t suggested_size,
-                     uv_buf_t* buf) {
+static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
   size_t buffer_size;
   CHECK_HANDLE(handle);
 
   /* Only allocate enough room for multiple dgrams if we can actually recv them */
   buffer_size = MAX_DGRAM_SIZE;
-  if (uv_udp_using_recvmmsg((uv_udp_t*)handle))
+  if (uv_udp_using_recvmmsg((uv_udp_t*) handle))
     buffer_size *= BUFFER_MULTIPLIER;
 
   /* Actually malloc to exercise free'ing the buffer later */
@@ -113,8 +112,8 @@ TEST_IMPL(udp_mmsg) {
 
   ASSERT_OK(uv_ip4_addr("0.0.0.0", TEST_PORT, &addr));
 
-  ASSERT_OK(uv_udp_init_ex(uv_default_loop(), &recver,
-                           AF_UNSPEC | UV_UDP_RECVMMSG));
+  ASSERT_OK(
+      uv_udp_init_ex(uv_default_loop(), &recver, AF_UNSPEC | UV_UDP_RECVMMSG));
 
   ASSERT_OK(uv_udp_bind(&recver, (const struct sockaddr*) &addr, 0));
 
@@ -126,7 +125,8 @@ TEST_IMPL(udp_mmsg) {
 
   buf = uv_buf_init("PING", 4);
   for (i = 0; i < NUM_SENDS; i++) {
-    ASSERT_EQ(4, uv_udp_try_send(&sender, &buf, 1, (const struct sockaddr*) &addr));
+    ASSERT_EQ(4,
+              uv_udp_try_send(&sender, &buf, 1, (const struct sockaddr*) &addr));
   }
 
   ASSERT_OK(uv_run(uv_default_loop(), UV_RUN_DEFAULT));

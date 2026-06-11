@@ -26,6 +26,6 @@
   struct pollfd* poll_fds;                                                    \
   size_t poll_fds_used;                                                       \
   size_t poll_fds_size;                                                       \
-  unsigned char poll_fds_iterating;                                           \
+  unsigned char poll_fds_iterating;
 
 #endif /* UV_POSIX_H */

@@ -31,14 +31,14 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <netdb.h>  /* MAXHOSTNAMELEN on Solaris */
+#include <netdb.h> /* MAXHOSTNAMELEN on Solaris */
 
 #include <termios.h>
 #include <pwd.h>
 
 #if !defined(__MVS__)
-#include <semaphore.h>
-#include <sys/param.h> /* MAXHOSTNAMELEN on Linux and the BSDs */
+# include <semaphore.h>
+# include <sys/param.h> /* MAXHOSTNAMELEN on Linux and the BSDs */
 #endif
 #include <pthread.h>
 #include <signal.h>
@@ -47,9 +47,9 @@
 
 #if defined(__linux__)
 # include "uv/linux.h"
-#elif defined (__MVS__)
+#elif defined(__MVS__)
 # include "uv/os390.h"
-#elif defined(__PASE__)  /* __PASE__ and _AIX are both defined on IBM i */
+#elif defined(__PASE__) /* __PASE__ and _AIX are both defined on IBM i */
 # include "uv/posix.h"  /* IBM i needs uv/posix.h, not uv/aix.h */
 #elif defined(_AIX)
 # include "uv/aix.h"
@@ -57,16 +57,11 @@
 # include "uv/sunos.h"
 #elif defined(__APPLE__)
 # include "uv/darwin.h"
-#elif defined(__DragonFly__)       || \
-      defined(__FreeBSD__)         || \
-      defined(__OpenBSD__)         || \
-      defined(__NetBSD__)
+#elif defined(__DragonFly__) || defined(__FreeBSD__) ||                       \
+    defined(__OpenBSD__) || defined(__NetBSD__)
 # include "uv/bsd.h"
-#elif defined(__CYGWIN__) || \
-      defined(__MSYS__)   || \
-      defined(__HAIKU__)  || \
-      defined(__QNX__)    || \
-      defined(__GNU__)
+#elif defined(__CYGWIN__) || defined(__MSYS__) || defined(__HAIKU__) ||       \
+    defined(__QNX__) || defined(__GNU__)
 # include "uv/posix.h"
 #endif
 
@@ -135,8 +130,7 @@ typedef pthread_cond_t uv_cond_t;
 typedef pthread_key_t uv_key_t;
 
 /* Note: guard clauses should match uv_barrier_init's in src/unix/thread.c. */
-#if defined(_AIX) || \
-    defined(__OpenBSD__) || \
+#if defined(_AIX) || defined(__OpenBSD__) ||                                  \
     !defined(PTHREAD_BARRIER_SERIAL_THREAD)
 /* TODO(bnoordhuis) Merge into uv_barrier_t in v2. */
 struct _uv_barrier {
@@ -164,8 +158,7 @@ typedef uid_t uv_uid_t;
 
 typedef struct dirent uv__dirent_t;
 
-#define UV_DIR_PRIVATE_FIELDS \
-  DIR* dir;
+#define UV_DIR_PRIVATE_FIELDS DIR* dir;
 
 #if defined(DT_UNKNOWN)
 # define HAVE_DIRENT_TYPES
@@ -232,7 +225,7 @@ typedef struct {
   struct uv__queue check_handles;                                             \
   struct uv__queue idle_handles;                                              \
   struct uv__queue async_handles;                                             \
-  void (*async_unused)(void);  /* TODO(bnoordhuis) Remove in libuv v2. */     \
+  void (*async_unused)(void); /* TODO(bnoordhuis) Remove in libuv v2. */      \
   uv__io_t async_io_watcher;                                                  \
   int async_wfd;                                                              \
   struct {                                                                    \
@@ -245,11 +238,11 @@ typedef struct {
   uv__io_t signal_io_watcher;                                                 \
   uv_signal_t child_watcher;                                                  \
   int emfile_fd;                                                              \
-  UV_PLATFORM_LOOP_FIELDS                                                     \
+  UV_PLATFORM_LOOP_FIELDS
 
 #define UV_REQ_TYPE_PRIVATE /* empty */
 
-#define UV_REQ_PRIVATE_FIELDS  /* empty */
+#define UV_REQ_PRIVATE_FIELDS /* empty */
 
 #define UV_PRIVATE_REQ_TYPES /* empty */
 
@@ -259,10 +252,9 @@ typedef struct {
   uv_buf_t* bufs;                                                             \
   unsigned int nbufs;                                                         \
   int error;                                                                  \
-  uv_buf_t bufsml[4];                                                         \
+  uv_buf_t bufsml[4];
 
-#define UV_CONNECT_PRIVATE_FIELDS                                             \
-  struct uv__queue queue;                                                     \
+#define UV_CONNECT_PRIVATE_FIELDS struct uv__queue queue;
 
 #define UV_SHUTDOWN_PRIVATE_FIELDS /* empty */
 
@@ -276,15 +268,15 @@ typedef struct {
   uv_buf_t* bufs;                                                             \
   ssize_t status;                                                             \
   uv_udp_send_cb send_cb;                                                     \
-  uv_buf_t bufsml[4];                                                         \
+  uv_buf_t bufsml[4];
 
 #define UV_HANDLE_PRIVATE_FIELDS                                              \
   uv_handle_t* next_closing;                                                  \
-  unsigned int flags;                                                         \
+  unsigned int flags;
 
 #define UV_STREAM_PRIVATE_FIELDS                                              \
-  uv_connect_t *connect_req;                                                  \
-  uv_shutdown_t *shutdown_req;                                                \
+  uv_connect_t* connect_req;                                                  \
+  uv_shutdown_t* shutdown_req;                                                \
   uv__io_t io_watcher;                                                        \
   struct uv__queue write_queue;                                               \
   struct uv__queue write_completed_queue;                                     \
@@ -292,7 +284,7 @@ typedef struct {
   int delayed_error;                                                          \
   int accepted_fd;                                                            \
   void* queued_fds;                                                           \
-  UV_STREAM_PRIVATE_PLATFORM_FIELDS                                           \
+  UV_STREAM_PRIVATE_PLATFORM_FIELDS
 
 #define UV_TCP_PRIVATE_FIELDS /* empty */
 
@@ -301,30 +293,28 @@ typedef struct {
   uv_udp_recv_cb recv_cb;                                                     \
   uv__io_t io_watcher;                                                        \
   struct uv__queue write_queue;                                               \
-  struct uv__queue write_completed_queue;                                     \
+  struct uv__queue write_completed_queue;
 
-#define UV_PIPE_PRIVATE_FIELDS                                                \
-  const char* pipe_fname; /* NULL or strdup'ed */
+#define UV_PIPE_PRIVATE_FIELDS const char* pipe_fname; /* NULL or strdup'ed */
 
-#define UV_POLL_PRIVATE_FIELDS                                                \
-  uv__io_t io_watcher;
+#define UV_POLL_PRIVATE_FIELDS uv__io_t io_watcher;
 
 #define UV_PREPARE_PRIVATE_FIELDS                                             \
   uv_prepare_cb prepare_cb;                                                   \
-  struct uv__queue queue;                                                     \
+  struct uv__queue queue;
 
 #define UV_CHECK_PRIVATE_FIELDS                                               \
   uv_check_cb check_cb;                                                       \
-  struct uv__queue queue;                                                     \
+  struct uv__queue queue;
 
 #define UV_IDLE_PRIVATE_FIELDS                                                \
   uv_idle_cb idle_cb;                                                         \
-  struct uv__queue queue;                                                     \
+  struct uv__queue queue;
 
 #define UV_ASYNC_PRIVATE_FIELDS                                               \
   uv_async_cb async_cb;                                                       \
   struct uv__queue queue;                                                     \
-  int pending;                                                                \
+  int pending;
 
 #define UV_TIMER_PRIVATE_FIELDS                                               \
   uv_timer_cb timer_cb;                                                       \
@@ -356,10 +346,10 @@ typedef struct {
 
 #define UV_PROCESS_PRIVATE_FIELDS                                             \
   struct uv__queue queue;                                                     \
-  int status;                                                                 \
+  int status;
 
 #define UV_FS_PRIVATE_FIELDS                                                  \
-  const char *new_path;                                                       \
+  const char* new_path;                                                       \
   uv_file file;                                                               \
   int flags;                                                                  \
   mode_t mode;                                                                \
@@ -371,10 +361,9 @@ typedef struct {
   double atime;                                                               \
   double mtime;                                                               \
   struct uv__work work_req;                                                   \
-  uv_buf_t bufsml[4];                                                         \
+  uv_buf_t bufsml[4];
 
-#define UV_WORK_PRIVATE_FIELDS                                                \
-  struct uv__work work_req;
+#define UV_WORK_PRIVATE_FIELDS struct uv__work work_req;
 
 #define UV_TTY_PRIVATE_FIELDS                                                 \
   struct termios orig_termios;                                                \
@@ -394,116 +383,116 @@ typedef struct {
 
 #define UV_FS_EVENT_PRIVATE_FIELDS                                            \
   uv_fs_event_cb cb;                                                          \
-  UV_PLATFORM_FS_EVENT_FIELDS                                                 \
+  UV_PLATFORM_FS_EVENT_FIELDS
 
 /* fs open() flags supported on this platform: */
 #if defined(O_APPEND)
-# define UV_FS_O_APPEND       O_APPEND
+# define UV_FS_O_APPEND O_APPEND
 #else
-# define UV_FS_O_APPEND       0
+# define UV_FS_O_APPEND 0
 #endif
 #if defined(O_CREAT)
-# define UV_FS_O_CREAT        O_CREAT
+# define UV_FS_O_CREAT O_CREAT
 #else
-# define UV_FS_O_CREAT        0
+# define UV_FS_O_CREAT 0
 #endif
 
 #if defined(__linux__) && defined(__arm__)
-# define UV_FS_O_DIRECT       0x10000
+# define UV_FS_O_DIRECT 0x10000
 #elif defined(__linux__) && defined(__m68k__)
-# define UV_FS_O_DIRECT       0x10000
+# define UV_FS_O_DIRECT 0x10000
 #elif defined(__linux__) && defined(__mips__)
-# define UV_FS_O_DIRECT       0x08000
+# define UV_FS_O_DIRECT 0x08000
 #elif defined(__linux__) && defined(__powerpc__)
-# define UV_FS_O_DIRECT       0x20000
+# define UV_FS_O_DIRECT 0x20000
 #elif defined(__linux__) && defined(__s390x__)
-# define UV_FS_O_DIRECT       0x04000
+# define UV_FS_O_DIRECT 0x04000
 #elif defined(__linux__) && defined(__x86_64__)
-# define UV_FS_O_DIRECT       0x04000
+# define UV_FS_O_DIRECT 0x04000
 #elif defined(__linux__) && defined(__loongarch__)
-# define UV_FS_O_DIRECT       0x04000
+# define UV_FS_O_DIRECT 0x04000
 #elif defined(O_DIRECT)
-# define UV_FS_O_DIRECT       O_DIRECT
+# define UV_FS_O_DIRECT O_DIRECT
 #else
-# define UV_FS_O_DIRECT       0
+# define UV_FS_O_DIRECT 0
 #endif
 
 #if defined(O_DIRECTORY)
-# define UV_FS_O_DIRECTORY    O_DIRECTORY
+# define UV_FS_O_DIRECTORY O_DIRECTORY
 #else
-# define UV_FS_O_DIRECTORY    0
+# define UV_FS_O_DIRECTORY 0
 #endif
 #if defined(O_DSYNC)
-# define UV_FS_O_DSYNC        O_DSYNC
+# define UV_FS_O_DSYNC O_DSYNC
 #else
-# define UV_FS_O_DSYNC        0
+# define UV_FS_O_DSYNC 0
 #endif
 #if defined(O_EXCL)
-# define UV_FS_O_EXCL         O_EXCL
+# define UV_FS_O_EXCL O_EXCL
 #else
-# define UV_FS_O_EXCL         0
+# define UV_FS_O_EXCL 0
 #endif
 #if defined(O_EXLOCK)
-# define UV_FS_O_EXLOCK       O_EXLOCK
+# define UV_FS_O_EXLOCK O_EXLOCK
 #else
-# define UV_FS_O_EXLOCK       0
+# define UV_FS_O_EXLOCK 0
 #endif
 #if defined(O_NOATIME)
-# define UV_FS_O_NOATIME      O_NOATIME
+# define UV_FS_O_NOATIME O_NOATIME
 #else
-# define UV_FS_O_NOATIME      0
+# define UV_FS_O_NOATIME 0
 #endif
 #if defined(O_NOCTTY)
-# define UV_FS_O_NOCTTY       O_NOCTTY
+# define UV_FS_O_NOCTTY O_NOCTTY
 #else
-# define UV_FS_O_NOCTTY       0
+# define UV_FS_O_NOCTTY 0
 #endif
 #if defined(O_NOFOLLOW)
-# define UV_FS_O_NOFOLLOW     O_NOFOLLOW
+# define UV_FS_O_NOFOLLOW O_NOFOLLOW
 #else
-# define UV_FS_O_NOFOLLOW     0
+# define UV_FS_O_NOFOLLOW 0
 #endif
 #if defined(O_NONBLOCK)
-# define UV_FS_O_NONBLOCK     O_NONBLOCK
+# define UV_FS_O_NONBLOCK O_NONBLOCK
 #else
-# define UV_FS_O_NONBLOCK     0
+# define UV_FS_O_NONBLOCK 0
 #endif
 #if defined(O_RDONLY)
-# define UV_FS_O_RDONLY       O_RDONLY
+# define UV_FS_O_RDONLY O_RDONLY
 #else
-# define UV_FS_O_RDONLY       0
+# define UV_FS_O_RDONLY 0
 #endif
 #if defined(O_RDWR)
-# define UV_FS_O_RDWR         O_RDWR
+# define UV_FS_O_RDWR O_RDWR
 #else
-# define UV_FS_O_RDWR         0
+# define UV_FS_O_RDWR 0
 #endif
 #if defined(O_SYMLINK)
-# define UV_FS_O_SYMLINK      O_SYMLINK
+# define UV_FS_O_SYMLINK O_SYMLINK
 #else
-# define UV_FS_O_SYMLINK      0
+# define UV_FS_O_SYMLINK 0
 #endif
 #if defined(O_SYNC)
-# define UV_FS_O_SYNC         O_SYNC
+# define UV_FS_O_SYNC O_SYNC
 #else
-# define UV_FS_O_SYNC         0
+# define UV_FS_O_SYNC 0
 #endif
 #if defined(O_TRUNC)
-# define UV_FS_O_TRUNC        O_TRUNC
+# define UV_FS_O_TRUNC O_TRUNC
 #else
-# define UV_FS_O_TRUNC        0
+# define UV_FS_O_TRUNC 0
 #endif
 #if defined(O_WRONLY)
-# define UV_FS_O_WRONLY       O_WRONLY
+# define UV_FS_O_WRONLY O_WRONLY
 #else
-# define UV_FS_O_WRONLY       0
+# define UV_FS_O_WRONLY 0
 #endif
 
 /* fs open() flags supported on other platforms: */
-#define UV_FS_O_FILEMAP       0
-#define UV_FS_O_RANDOM        0
-#define UV_FS_O_SHORT_LIVED   0
-#define UV_FS_O_SEQUENTIAL    0
-#define UV_FS_O_TEMPORARY     0
+#define UV_FS_O_FILEMAP     0
+#define UV_FS_O_RANDOM      0
+#define UV_FS_O_SHORT_LIVED 0
+#define UV_FS_O_SEQUENTIAL  0
+#define UV_FS_O_TEMPORARY   0
 
 #endif /* UV_UNIX_H */

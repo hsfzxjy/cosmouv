@@ -87,18 +87,14 @@ int uv_getnameinfo(uv_loop_t* loop,
     return UV_EINVAL;
 
   if (addr->sa_family == AF_INET) {
-    memcpy(&req->storage,
-           addr,
-           sizeof(struct sockaddr_in));
+    memcpy(&req->storage, addr, sizeof(struct sockaddr_in));
   } else if (addr->sa_family == AF_INET6) {
-    memcpy(&req->storage,
-           addr,
-           sizeof(struct sockaddr_in6));
+    memcpy(&req->storage, addr, sizeof(struct sockaddr_in6));
   } else {
     return UV_EINVAL;
   }
 
-  uv__req_init(loop, (uv_req_t*)req, UV_GETNAMEINFO);
+  uv__req_init(loop, (uv_req_t*) req, UV_GETNAMEINFO);
 
   req->getnameinfo_cb = getnameinfo_cb;
   req->flags = flags;
